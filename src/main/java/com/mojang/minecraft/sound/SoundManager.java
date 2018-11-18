@@ -84,8 +84,8 @@ public final class SoundManager {
 
          try {
             var1.play(new Music(var1, var8.toURI().toURL()));
-         } catch (MalformedURLException var5) {
-            var5.printStackTrace();
+//         } catch (MalformedURLException var5) {
+//            var5.printStackTrace();
          } catch (IOException var6) {
             var6.printStackTrace();
          }

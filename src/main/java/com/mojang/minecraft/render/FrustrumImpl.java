@@ -19,8 +19,8 @@ public final class FrustrumImpl extends Frustrum {
       instance.projectionBuff.clear();
       var0.modelviewBuff.clear();
       var0.unused.clear();
-      GL11.glGetFloat(2983, var0.projectionBuff);
-      GL11.glGetFloat(2982, var0.modelviewBuff);
+      GL11.glGetFloatv(2983, var0.projectionBuff);
+      GL11.glGetFloatv(2982, var0.modelviewBuff);
       var0.projectionBuff.flip().limit(16);
       var0.projectionBuff.get(var0.projection);
       var0.modelviewBuff.flip().limit(16);
