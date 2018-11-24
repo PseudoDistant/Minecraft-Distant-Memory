@@ -85,10 +85,10 @@ public final class Renderer {
          float var4 = 0.7F;
          float var2 = 0.3F;
          Vec3D var3 = (new Vec3D(0.0F, -1.0F, 0.5F)).normalize();
-         GL11.glLightfv(16384, 4611, this.createBuffer(var3.x, var3.y, var3.z, 0.0F));
-         GL11.glLightfv(16384, 4609, this.createBuffer(var2, var2, var2, 1.0F));
-         GL11.glLightfv(16384, 4608, this.createBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-         GL11.glLightModelfv(2899, this.createBuffer(var4, var4, var4, 1.0F));
+         GL11.glLight(16384, 4611, this.createBuffer(var3.x, var3.y, var3.z, 0.0F));
+         GL11.glLight(16384, 4609, this.createBuffer(var2, var2, var2, 1.0F));
+         GL11.glLight(16384, 4608, this.createBuffer(0.0F, 0.0F, 0.0F, 1.0F));
+         GL11.glLightModel(2899, this.createBuffer(var4, var4, var4, 1.0F));
       }
    }
 
@@ -107,7 +107,7 @@ public final class Renderer {
    public void updateFog() {
       Level var1 = this.minecraft.level;
       Player var2 = this.minecraft.player;
-      GL11.glFogfv(2918, this.createBuffer(this.fogRed, this.fogBlue, this.fogGreen, 1.0F));
+      GL11.glFog(2918, this.createBuffer(this.fogRed, this.fogBlue, this.fogGreen, 1.0F));
       GL11.glNormal3f(0.0F, -1.0F, 0.0F);
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
       Block var5;
@@ -132,7 +132,7 @@ public final class Renderer {
                var3 = var3;
             }
 
-            GL11.glLightModelfv(2899, this.createBuffer(var7, var8, var3, 1.0F));
+            GL11.glLightModel(2899, this.createBuffer(var7, var8, var3, 1.0F));
          } else if(var6 == LiquidType.LAVA) {
             GL11.glFogf(2914, 2.0F);
             var7 = 0.4F;
@@ -147,13 +147,13 @@ public final class Renderer {
                var3 = var3;
             }
 
-            GL11.glLightModelfv(2899, this.createBuffer(var7, var8, var3, 1.0F));
+            GL11.glLightModel(2899, this.createBuffer(var7, var8, var3, 1.0F));
          }
       } else {
          GL11.glFogi(2917, 9729);
          GL11.glFogf(2915, 0.0F);
          GL11.glFogf(2916, this.fogEnd);
-         GL11.glLightModelfv(2899, this.createBuffer(1.0F, 1.0F, 1.0F, 1.0F));
+         GL11.glLightModel(2899, this.createBuffer(1.0F, 1.0F, 1.0F, 1.0F));
       }
 
       GL11.glEnable(2903);
