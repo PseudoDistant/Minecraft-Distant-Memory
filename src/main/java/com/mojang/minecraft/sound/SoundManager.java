@@ -30,27 +30,23 @@ public final class SoundManager {
       }
    }
 
-   public void registerSound(File var1, String var2) {
+   public void registerSound(File file, String name) {
       try {
-         for(var2 = var2.substring(0, var2.length() - 4).replaceAll("/", "."); Character.isDigit(var2.charAt(var2.length() - 1)); var2 = var2.substring(0, var2.length() - 1)) {
+         for(name = name.substring(0, name.length() - 4).replaceAll("/", "."); Character.isDigit(name.charAt(name.length() - 1)); name = name.substring(0, name.length() - 1)) {
             ;
          }
-
-         SoundData var7 = SoundReader.read(var1.toURI().toURL());
-         Map var3 = this.sounds;
+         SoundData data = SoundReader.read(file.toURI().toURL());
          synchronized(this.sounds) {
-            Object var4;
-            if((var4 = (List)this.sounds.get(var2)) == null) {
-               var4 = new ArrayList();
-               this.sounds.put(var2, var4);
+            List list;
+            if((list = (List)this.sounds.get(name)) == null) {
+               list = new ArrayList();
+               this.sounds.put(name, list);
             }
-
-            ((List)var4).add(var7);
+            ((List)list).add(data);
          }
-      } catch (Exception var6) {
-         var6.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
       }
-
    }
 
    public final void registerMusic(String var1, File var2) {
@@ -84,8 +80,6 @@ public final class SoundManager {
 
          try {
             var1.play(new Music(var1, var8.toURI().toURL()));
-//         } catch (MalformedURLException var5) {
-//            var5.printStackTrace();
          } catch (IOException var6) {
             var6.printStackTrace();
          }

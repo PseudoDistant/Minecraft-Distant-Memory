@@ -25,13 +25,13 @@ public final class LevelGenerator {
       this.progressBar = var1;
    }
 
-   public final Level generate(String var1, int var2, int var3, int var4) {
+   public final Level generate(String username, int width, int depth, int var4) {
       this.progressBar.setTitle("Generating level");
-      this.width = var2;
-      this.depth = var3;
+      this.width = width;
+      this.depth = depth;
       this.height = 64;
       this.waterLevel = 32;
-      this.blocks = new byte[var2 * var3 << 6];
+      this.blocks = new byte[width * depth << 6];
       this.progressBar.setText("Raising..");
       LevelGenerator var5 = this;
       CombinedNoise var6 = new CombinedNoise(new OctaveNoise(this.random, 8), new OctaveNoise(this.random, 8));
@@ -344,9 +344,9 @@ public final class LevelGenerator {
 
       Level var65;
       (var65 = new Level()).waterLevel = this.waterLevel;
-      var65.setData(var2, 64, var3, this.blocks);
+      var65.setData(width, 64, depth, this.blocks);
       var65.createTime = System.currentTimeMillis();
-      var65.creator = var1;
+      var65.creator = username;
       var65.name = "A Nice World";
       int[] var52 = var9;
       Level var47 = var65;

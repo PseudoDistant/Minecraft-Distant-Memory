@@ -222,7 +222,7 @@ public final class Minecraft implements Runnable {
       this.running = true;
 
       try {
-         Minecraft var1 = this;
+         Minecraft minecraft = this;
          if(this.canvas != null) {
             Display.setParent(this.canvas);
          } else if(this.fullscreen) {
@@ -237,12 +237,12 @@ public final class Minecraft implements Runnable {
 
          try {
             Display.create();
-         } catch (LWJGLException var57) {
-            var57.printStackTrace();
+         } catch (LWJGLException lwjglException) {
+            lwjglException.printStackTrace();
 
             try {
                Thread.sleep(1000L);
-            } catch (InterruptedException var56) {
+            } catch (InterruptedException ignoredException) {
                ;
             }
 
@@ -254,8 +254,8 @@ public final class Minecraft implements Runnable {
 
          try {
             Controllers.create();
-         } catch (Exception var55) {
-            var55.printStackTrace();
+         } catch (Exception exception) {
+            exception.printStackTrace();
          }
 
          checkGLError("Pre startup");
@@ -271,36 +271,36 @@ public final class Minecraft implements Runnable {
          GL11.glLoadIdentity();
          GL11.glMatrixMode(5888);
          checkGLError("Startup");
-         String var3 = "minecraftclassicforever";
-         String var5 = System.getProperty("user.home", ".");
-         String var6;
-         File var7;
-         switch(OperatingSystemLookup.lookup[((var6 = System.getProperty("os.name").toLowerCase()).contains("win")?Minecraft$OS.windows:(var6.contains("mac")?Minecraft$OS.macos:(var6.contains("solaris")?Minecraft$OS.solaris:(var6.contains("sunos")?Minecraft$OS.solaris:(var6.contains("linux")?Minecraft$OS.linux:(var6.contains("unix")?Minecraft$OS.linux:Minecraft$OS.unknown)))))).ordinal()]) {
+         String minecraftDirName = "minecraftclassicforever";
+         String userDir = System.getProperty("user.home", ".");
+         String osname;
+         File workDir;
+         switch(OperatingSystemLookup.lookup[((osname = System.getProperty("os.name").toLowerCase()).contains("win")?Minecraft$OS.windows:(osname.contains("mac")?Minecraft$OS.macos:(osname.contains("solaris")?Minecraft$OS.solaris:(osname.contains("sunos")?Minecraft$OS.solaris:(osname.contains("linux")?Minecraft$OS.linux:(osname.contains("unix")?Minecraft$OS.linux:Minecraft$OS.unknown)))))).ordinal()]) {
          case 1:
          case 2:
-            var7 = new File(var5, '.' + var3 + '/');
+            workDir = new File(userDir, '.' + minecraftDirName + '/');
             break;
          case 3:
-            String var8;
-            if((var8 = System.getenv("APPDATA")) != null) {
-               var7 = new File(var8, "." + var3 + '/');
+            String appDataDir;
+            if((appDataDir = System.getenv("APPDATA")) != null) {
+               workDir = new File(appDataDir, "." + minecraftDirName + '/');
             } else {
-               var7 = new File(var5, '.' + var3 + '/');
+               workDir = new File(userDir, '.' + minecraftDirName + '/');
             }
             break;
          case 4:
-            var7 = new File(var5, "Library/Application Support/" + var3);
+            workDir = new File(userDir, "Library/Application Support/" + minecraftDirName);
             break;
          default:
-            var7 = new File(var5, var3 + '/');
+            workDir = new File(userDir, minecraftDirName + '/');
          }
 
-         if(!var7.exists() && !var7.mkdirs()) {
-            throw new RuntimeException("The working directory could not be created: " + var7);
+         if(!workDir.exists() && !workDir.mkdirs()) {
+            throw new RuntimeException("The working directory could not be created: " + workDir);
          }
 
-         File var2 = var7;
-         this.settings = new GameSettings(this, var7);
+         File var2 = workDir;
+         this.settings = new GameSettings(this, workDir);
          this.textureManager = new TextureManager(this.settings);
          this.textureManager.registerAnimation(new TextureLavaFX());
          this.textureManager.registerAnimation(new TextureWaterFX());
@@ -312,23 +312,24 @@ public final class Minecraft implements Runnable {
          Mob.modelCache = new ModelManager();
          GL11.glViewport(0, 0, this.width, this.height);
          if(this.server != null && this.session != null) {
-            Level var85;
-            (var85 = new Level()).setData(8, 8, 8, new byte[512]);
-            this.setLevel(var85);
+            Level level;
+            (level = new Level()).setData(8, 8, 8, new byte[512]);
+            this.setLevel(level);
          } else {
             boolean var10 = false;
 
             try {
-               if(var1.levelName != null) {
-                  var1.loadOnlineLevel(var1.levelName, var1.levelId);
-               } else if(!var1.levelLoaded) {
-                  Level var11 = null;
-                  if((var11 = var1.levelIo.load((InputStream)(new FileInputStream(new File("level.dat"))))) != null) {
-                     var1.setLevel(var11);
+               if(minecraft.levelName != null) {
+                  minecraft.loadOnlineLevel(minecraft.levelName, minecraft.levelId);
+               } else if(!minecraft.levelLoaded) {
+                  Level level = null;
+                  if((level = minecraft.levelIo.load((InputStream)(new FileInputStream(new File("level.dat"))))) != null) {
+                     minecraft.setLevel(level);
                   }
                }
-            } catch (Exception var54) {
-               var54.printStackTrace();
+            } catch (Exception levelException) {
+               System.err.println("ERROR: Cannot load level information from file \"" + new File("level.dat").getAbsolutePath() + "\". " + levelException.getLocalizedMessage() + ".");
+               levelException.printStackTrace();
             }
 
             if(this.level == null) {
@@ -339,15 +340,15 @@ public final class Minecraft implements Runnable {
          this.particleManager = new ParticleManager(this.level, this.textureManager);
          if(this.levelLoaded) {
             try {
-               var1.cursor = new Cursor(16, 16, 0, 0, 1, var9, (IntBuffer)null);
+               minecraft.cursor = new Cursor(16, 16, 0, 0, 1, var9, (IntBuffer)null);
             } catch (LWJGLException var53) {
                var53.printStackTrace();
             }
          }
 
          try {
-            var1.soundPlayer = new SoundPlayer(var1.settings);
-            SoundPlayer var4 = var1.soundPlayer;
+            minecraft.soundPlayer = new SoundPlayer(minecraft.settings);
+            SoundPlayer var4 = minecraft.soundPlayer;
 
             try {
                AudioFormat var67 = new AudioFormat(44100.0F, 16, 2, true, true);
@@ -364,8 +365,8 @@ public final class Minecraft implements Runnable {
                var4.running = false;
             }
 
-            var1.resourceThread = new ResourceDownloadThread(var2, var1);
-            var1.resourceThread.start();
+            minecraft.resourceThread = new ResourceDownloadThread(var2, minecraft);
+            minecraft.resourceThread.start();
          } catch (Exception var52) {
             ;
          }
@@ -1718,18 +1719,18 @@ public final class Minecraft implements Runnable {
    }
 
    public final void generateLevel(int var1) {
-      String var2 = this.session != null?this.session.username:"anonymous";
-      Level var4 = (new LevelGenerator(this.progressBar)).generate(var2, 128 << var1, 128 << var1, 64);
-      this.gamemode.prepareLevel(var4);
-      this.setLevel(var4);
+      String username = this.session != null?this.session.username:"anonymous";
+      Level level = (new LevelGenerator(this.progressBar)).generate(username, 128 << var1, 128 << var1, 64);
+      this.gamemode.prepareLevel(level);
+      this.setLevel(level);
    }
 
    public final boolean loadOnlineLevel(String var1, int var2) {
-      Level var3;
-      if((var3 = this.levelIo.loadOnline(this.host, var1, var2)) == null) {
+      Level level;
+      if((level = this.levelIo.loadOnline(this.host, var1, var2)) == null) {
          return false;
       } else {
-         this.setLevel(var3);
+         this.setLevel(level);
          return true;
       }
    }

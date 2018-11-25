@@ -13,12 +13,12 @@ import java.net.URL;
 // TODO.
 public final class SoundReader {
 
-   public static SoundData read(URL var0) {
-	   VorbisStream var12 = null;
+   public static SoundData read(URL url) {
+	   VorbisStream vorbis = null;
 	   try
 	   {
-		   LogicalOggStreamImpl var11 = (LogicalOggStreamImpl)(new OnDemandUrlStream(var0)).getLogicalStreams().iterator().next();
-		   var12 = new VorbisStream(var11);
+		   LogicalOggStreamImpl ogg = (LogicalOggStreamImpl)(new OnDemandUrlStream(url)).getLogicalStreams().iterator().next();
+		   vorbis = new VorbisStream(ogg);
 	   } catch (VorbisFormatException e) {
 		   e.printStackTrace();
 	   } catch (OggFormatException e) {
@@ -26,64 +26,61 @@ public final class SoundReader {
 	   } catch (IOException e) {
 		   e.printStackTrace();
 	   }
-	   byte[] var2 = new byte[4096];
-      int var3 = 0;
-      boolean var1 = false;
-      IdentificationHeader var14 = var12.getIdentificationHeader();
-      int var4 = var12.getIdentificationHeader().getChannels();
-      short[] var5 = new short[4096];
-      int var6 = 0;
+	   byte[] buffer = new byte[4096];
+       int written = 0;
+       boolean var1 = false;
+       int channels = vorbis.getIdentificationHeader().getChannels();
+       short[] data = new short[4096];
+       int length = 0;
 
       label51:
-      while(var3 >= 0) {
-         int var15 = 0;
+      while(written >= 0) {
+         int offset = 0;
 
          while(true) {
             try {
-               if(var15 < var2.length && (var3 = var12.readPcm(var2, var15, var2.length - var15)) > 0) {
-                  var15 += var3;
+               if(offset < buffer.length && (written = vorbis.readPcm(buffer, offset, buffer.length - offset)) > 0) {
+                  offset += written;
                   continue;
                }
-            } catch (Exception var10) {
-               var3 = -1;
+            } catch (Exception exception) {
+               written = -1;
             }
-
-            if(var15 <= 0) {
+            if(offset <= 0) {
                break;
             }
 
             boolean var7 = false;
-            int var16 = 0;
+            int off = 0;
 
             while(true) {
-               if(var16 >= var15) {
-                  continue label51;
+               if(off >= offset) {
+                  break label51;
                }
 
                int var8 = 0;
 
-               for(int var9 = 0; var9 < var4; ++var9) {
-                  var8 += var2[var16++] << 8 | var2[var16++] & 255;
+               for(int i = 0; i < channels; ++i) {
+                  var8 += buffer[off++] << 8 | buffer[off++] & 255;
                }
 
-               if(var6 == var5.length) {
-                  short[] var18 = var5;
-                  var5 = new short[var5.length << 1];
-                  System.arraycopy(var18, 0, var5, 0, var6);
+               if(length == data.length) {
+                  short[] shortData = data;
+                  data = new short[data.length << 1];
+                  System.arraycopy(shortData, 0, data, 0, length);
                }
 
-               var5[var6++] = (short)(var8 / var4);
+               data[length++] = (short)(var8 / channels);
             }
          }
       }
-
-      if(var6 != var5.length) {
-         short[] var17 = var5;
-         var5 = new short[var6];
-         System.arraycopy(var17, 0, var5, 0, var6);
+      if(length != data.length) {
+         short[] shortData = data;
+         data = new short[length];
+         System.arraycopy(shortData, 0, data, 0, length);
       }
 
-      IdentificationHeader var13;
-      return new SoundData(var5, (float)(var13 = var12.getIdentificationHeader()).getSampleRate());
+      IdentificationHeader header = vorbis.getIdentificationHeader();
+      return new SoundData(data, (float)header.getSampleRate());
    }
 }

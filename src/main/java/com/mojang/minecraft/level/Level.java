@@ -103,17 +103,17 @@ public class Level implements Serializable {
       }
    }
 
-   public void setData(int var1, int var2, int var3, byte[] var4) {
-      this.width = var1;
-      this.height = var3;
-      this.depth = var2;
-      this.blocks = var4;
-      this.blockers = new int[var1 * var3];
+   public void setData(int width, int depth, int height, byte[] blocks) {
+      this.width = width;
+      this.height = height;
+      this.depth = depth;
+      this.blocks = blocks;
+      this.blockers = new int[width * height];
       Arrays.fill(this.blockers, this.depth);
-      this.calcLightDepths(0, 0, var1, var3);
+      this.calcLightDepths(0, 0, width, height);
 
-      for(var1 = 0; var1 < this.listeners.size(); ++var1) {
-         ((LevelRenderer)this.listeners.get(var1)).refresh();
+      for(width = 0; width < this.listeners.size(); ++width) {
+         ((LevelRenderer)this.listeners.get(width)).refresh();
       }
 
       this.tickList.clear();

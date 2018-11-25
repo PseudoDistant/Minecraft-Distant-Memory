@@ -1,9 +1,9 @@
 package com.mojang.minecraft;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ResourceDownloadThread extends Thread
 {
@@ -11,7 +11,7 @@ public class ResourceDownloadThread extends Thread
 	{
 		this.minecraft = minecraft;
 
-		this.setName("Resource download thread");
+		this.setName("Resource downloadUrl thread");
 		this.setDaemon(true);
 
 		dir = new File(minecraftFolder, "resources/");
@@ -27,73 +27,72 @@ public class ResourceDownloadThread extends Thread
 	{
 		BufferedReader reader = null;
 
+		List<String> list = new ArrayList<String>();
+		File baseSoundsSourceDir = new File("sounds");
 		try {
-			ArrayList<String> list = new ArrayList<String>();
+			URL base = null;
+			URL url = null;
+			URLConnection con = null;
 
-			URL base = new URL("http://dl.dropbox.com/u/40737374/minecraft_resources/");
-			URL url = new URL(base, "resources/");
+			try {
+				base = new URL("http://dl.dropbox.com/u/40737374/minecraft_resources/");
+				url = new URL(base, "resources/");
 
-			URLConnection con = url.openConnection();
+				con = url.openConnection();
 
-			con.setConnectTimeout(20000);
+				con.setConnectTimeout(20000);
 
-			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-			String line = null;
-
-			while((line = reader.readLine()) != null)
-			{
-				list.add(line);
+				if (con instanceof HttpURLConnection) {
+					int code = ((HttpURLConnection) con).getResponseCode();
+					String status = ((HttpURLConnection) con).getResponseMessage();
+					if (code != 200) {
+						((HttpURLConnection) con).disconnect();
+						con = null;
+						System.err.println("WARN:  A request to URL \"" + url.toString() + "\" returned " + code + " http response code with status \"" + status + "\".");
+					}
+				}
+			} catch (UnknownHostException unknownHost) {
+				unknownHost.printStackTrace();
+				con = null;
 			}
 
-			reader.close();
+			if (con != null) {
+				reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
-			/*for(String s : list)
-			{
-				try {
-					String split[] = s.split(",");
-					int size = Integer.parseInt(split[1]);
-					File file = new File(dir, split[0]);
+				String line = null;
 
-					if(!file.exists() || file.length() != size)
-					{
-						try {
-							file.getParentFile().mkdirs();
-						} catch(SecurityException e) {
-							e.printStackTrace();
-						}
-
-						URL url1 = new URL(base, split[0].replaceAll(" ", "%20"));
-
-						download(url1, file, size);
-					} else {
-						int index = split[0].indexOf("/");
-
-						if(split[0].substring(0, index).equalsIgnoreCase("sound"))
-						{
-							minecraft.sound.registerSound(file, split[0].substring(index + 1, split[0].length() - 4).replaceAll("[1-9]", "").replaceAll("/", "."));
-							//this.mc.audio.registerSound(split[0].substring(index + 1, split[0].length() - 4).replaceAll("[1-9]", "").replaceAll("/", "."), file.toURI().toURL(), true);
-						} else if (split[0].substring(0, index).equalsIgnoreCase("music")) {
-							if(split[0].contains("sweden"))
-							{
-								//this.mc.audio.registerMusic("menu", file.toURI().toURL(), true);
-							}
-
-							//this.mc.audio.registerMusic("bg", file.toURI().toURL(), true);
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
+				while ((line = reader.readLine()) != null) {
+					list.add(line);
 				}
 
-				if (!this.running) return;
-			}*/
+				reader.close();
+			} else {
+				list = listOfSoundsFromLocalFile(new File(baseSoundsSourceDir, "list.csv"));
+			}
 
+			int numErrors = 0;
 			for(String s : list)
 			{
+				if (s == null || s.trim().startsWith("//") || s.trim().startsWith("#")) {
+					continue;
+				}
 				String split[] = s.split(",");
-				int size = Integer.parseInt(split[1]);
-				File file = new File(dir, split[0]);
+				if (split == null || split.length < 2) {
+					numErrors++;
+					if (numErrors < 3) {
+						System.out.println("ERROR: Line Content: \"" + s + "\". Cannot split line into two elements separated by comma (,). Expected format is \"<filename>,<size>\".");
+					}
+					continue;
+				}
+				String path = split[0];
+				int size = -1;
+				try {
+					size = Integer.parseInt(split[1]);
+				} catch (NumberFormatException nfe) {
+					// Ignored
+				}
+
+				File file = new File(dir, path);
 
 				File musicFolder = new File(dir, "music");
 
@@ -105,20 +104,20 @@ public class ResourceDownloadThread extends Thread
 						e.printStackTrace();
 					}
 
-					URL url1 = new URL(base, split[0].replaceAll(" ", "%20"));
+
 
 					if(file.getPath().contains("music"))
 					{
 						if(file.getName().equals("minecraft.ogg") && !new File(musicFolder, "calm1.ogg").exists())
 						{
-							download(url1, file, size);
+							download(path, base, baseSoundsSourceDir, file, size);
 						} else if(file.getName().equals("clark.ogg") && !new File(musicFolder, "calm2.ogg").exists()) {
-							download(url1, file, size);
+							download(path, base, baseSoundsSourceDir, file, size);
 						} else if(file.getName().equals("sweden.ogg") && !new File(musicFolder, "calm3.ogg").exists()) {
-							download(url1, file, size);
+							download(path, base, baseSoundsSourceDir, file, size);
 						}
 					} else {
-						download(url1, file, size);
+						download(path, base, baseSoundsSourceDir, file, size);
 					}
 				}
 
@@ -131,7 +130,7 @@ public class ResourceDownloadThread extends Thread
 				swedenOGG.renameTo(new File(musicFolder, "calm3.ogg"));
 			}
 
-			File soundsFolder = new File(dir, "sound");
+			File soundsFolder = dir;
 			File stepsFolder = new File(soundsFolder, "step");
 
 			for(int i = 1; i <= 4; i++)
@@ -152,8 +151,9 @@ public class ResourceDownloadThread extends Thread
 			e.printStackTrace();
 		} finally {
 			try {
-				if (reader != null)
+				if (reader != null) {
 					reader.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -162,6 +162,30 @@ public class ResourceDownloadThread extends Thread
 		this.finished = true;
 	}
 
+	private List<String> listOfSoundsFromLocalFile(File soundsCsv) {
+		List<String> list = new ArrayList<String>();
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(new FileInputStream(soundsCsv)));
+			String line = null;
+			while ((line = in.readLine()) != null){
+				list.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
+
 	private File dir;
 	private Minecraft minecraft;
 	boolean running = false;
@@ -169,67 +193,133 @@ public class ResourceDownloadThread extends Thread
 	private boolean finished = false;
 	private int progress = 0;
 
-	private void download(URL url, File file, int size)
-	{
-		System.out.println("Downloading: " + file.getName() + "...");
+	private void download(String path, URL url, File dir, File dest, int size) {
+		boolean success = true;
+		try {
+		 	success = downloadUrl(url, path, dest, size);
+		} catch (Throwable t) {
+			success = false;
+		}
+		if (!success) {
+			downloadLocalFile(dir, path, dest, size);
+		}
+	}
 
-		//minecraft.progressBar.setText(file.getName());
-
+	private boolean downloadLocalFile(File base, String path, File file, int size) {
+		boolean success = true;
+		System.out.print("INFO:  Downloading: " + file.getName() + " from \"" + base.getAbsolutePath() + "\" ...");
 		DataInputStream in = null;
 		DataOutputStream out = null;
-
-		try
-		{
+		try {
 			byte[] data = new byte[4096];
 
-			in = new DataInputStream(url.openStream());
+			in = new DataInputStream(new FileInputStream(new File(base, path)));
 			FileOutputStream fos = new FileOutputStream(file);
 			out = new DataOutputStream(fos);
-
 			int done = 0;
-
-			do
-			{
+			do {
 				int length = in.read(data);
-
-				if(length < 0)
-				{
+				if(length < 0) {
 					in.close();
 					out.close();
-
-					return;
+					break;
 				}
-
 				out.write(data, 0, length);
-
 				done += length;
 				progress = (int)(((double)done / (double)size) * 100);
 			} while(!running);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			success = false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			success = false;
 		} finally {
-			try
-			{
-				if(in != null)
-				{
+			try {
+				if(in != null) {
 					in.close();
 				}
-
-				if(out != null)
-				{
+				if(out != null) {
 					out.close();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				success = false;
+			}
+		}
+		progress = 0;
+		if (success) {
+			System.out.println(" Downloaded");
+		} else {
+			System.out.println();
+		}
+		return success;
+	}
+
+	private boolean downloadUrl(URL base, String path, File file, int size) throws MalformedURLException {
+		boolean success = true;
+		URL url = new URL(base, path.replaceAll(" ", "%20"));
+		System.out.print("INFO:  Downloading: " + file.getName() + " from \"" + url.toString() + "\" ...");
+
+		DataInputStream in = null;
+		DataOutputStream out = null;
+
+		try {
+			byte[] data = new byte[4096];
+
+			URLConnection connection = url.openConnection();
+			if (connection instanceof HttpURLConnection) {
+				HttpURLConnection httpConnection = (HttpURLConnection)connection;
+				int code = httpConnection.getResponseCode();
+				String message = httpConnection.getResponseMessage();
+				if (code != 200) {
+					System.out.println("  " + code + " " + message);
+					httpConnection.disconnect();
+					return false;
+				}
+			}
+			in = new DataInputStream(connection.getInputStream());
+			FileOutputStream fos = new FileOutputStream(file);
+			out = new DataOutputStream(fos);
+			int done = 0;
+			do {
+				int length = in.read(data);
+
+				if(length < 0) {
+					in.close();
+					out.close();
+					break;
+				}
+				out.write(data, 0, length);
+				done += length;
+				progress = (int)(((double)done / (double)size) * 100);
+			} while(!running);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			success = false;
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			try {
+				if(in != null) {
+					in.close();
+				}
+				if(out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				success = false;
 			}
 		}
 
-		//minecraft.progressBar.setText("");
 		progress = 0;
-
-		System.out.println("Downloaded: " + file.getName());
+		if (success) {
+			System.out.println(" Downloaded");
+		} else {
+			System.out.println();
+		}
+		return success;
 	}
 
 	public boolean isFinished()

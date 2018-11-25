@@ -139,7 +139,7 @@ public final class LevelIO {
       }
    }
 
-   public final Level loadOnline(String var1, String var2, int var3) {
+   public final Level loadOnline(String server, String user, int id) {
       if(this.progressBar != null) {
          this.progressBar.setTitle("Loading level");
       }
@@ -150,32 +150,32 @@ public final class LevelIO {
          }
 
          HttpURLConnection var6;
-         (var6 = (HttpURLConnection)(new URL("http://" + var1 + "/level/load.html?id=" + var3 + "&user=" + var2)).openConnection()).setDoInput(true);
+         (var6 = (HttpURLConnection)(new URL("http://" + server + "/level/load.html?id=" + id + "&user=" + user)).openConnection()).setDoInput(true);
          if(this.progressBar != null) {
             this.progressBar.setText("Loading..");
          }
 
-         DataInputStream var7;
-         if((var7 = new DataInputStream(var6.getInputStream())).readUTF().equalsIgnoreCase("ok")) {
-            return this.load((InputStream)var7);
+         DataInputStream in;
+         if((in = new DataInputStream(var6.getInputStream())).readUTF().equalsIgnoreCase("ok")) {
+            return this.load((InputStream)in);
          } else {
             if(this.progressBar != null) {
-               this.progressBar.setText("Failed: " + var7.readUTF());
+               this.progressBar.setText("Failed: " + in.readUTF());
             }
 
-            var7.close();
+            in.close();
             Thread.sleep(1000L);
             return null;
          }
-      } catch (Exception var5) {
-         var5.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
          if(this.progressBar != null) {
             this.progressBar.setText("Failed!");
          }
 
          try {
             Thread.sleep(3000L);
-         } catch (InterruptedException var4) {
+         } catch (InterruptedException interrupted) {
             ;
          }
 
