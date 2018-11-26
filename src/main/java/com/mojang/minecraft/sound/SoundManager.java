@@ -49,39 +49,37 @@ public final class SoundManager {
       }
    }
 
-   public final void registerMusic(String var1, File var2) {
-      Map var3 = this.music;
+   public final void registerMusic(String name, File file) {
       synchronized(this.music) {
-         for(var1 = var1.substring(0, var1.length() - 4).replaceAll("/", "."); Character.isDigit(var1.charAt(var1.length() - 1)); var1 = var1.substring(0, var1.length() - 1)) {
+         for(name = name.substring(0, name.length() - 4).replaceAll("/", "."); Character.isDigit(name.charAt(name.length() - 1)); name = name.substring(0, name.length() - 1)) {
             ;
          }
 
-         Object var4;
-         if((var4 = (List)this.music.get(var1)) == null) {
-            var4 = new ArrayList();
-            this.music.put(var1, var4);
+         Object list;
+         if((list = (List)this.music.get(name)) == null) {
+            list = new ArrayList();
+            this.music.put(name, list);
          }
 
-         ((List)var4).add(var2);
+         ((List)list).add(file);
       }
    }
 
-   public boolean playMusic(SoundPlayer var1, String var2) {
-      List var3 = null;
-      Map var4 = this.music;
+   public boolean playMusic(SoundPlayer player, String name) {
+      List list = null;
       synchronized(this.music) {
-         var3 = (List)this.music.get(var2);
+         list = (List)this.music.get(name);
       }
 
-      if(var3 == null) {
+      if(list == null) {
          return false;
       } else {
-         File var8 = (File)var3.get(this.random.nextInt(var3.size()));
+         File file = (File)list.get(this.random.nextInt(list.size()));
 
          try {
-            var1.play(new Music(var1, var8.toURI().toURL()));
-         } catch (IOException var6) {
-            var6.printStackTrace();
+            player.play(new Music(player, file.toURI().toURL()));
+         } catch (IOException ioException) {
+            ioException.printStackTrace();
          }
 
          return true;

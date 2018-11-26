@@ -29,6 +29,7 @@ public class ResourceDownloadThread extends Thread
 
 		List<String> list = new ArrayList<String>();
 		File baseSoundsSourceDir = new File("sounds");
+		File musicFolder = new File(dir, "music");
 		try {
 			URL base = null;
 			URL url = null;
@@ -94,8 +95,6 @@ public class ResourceDownloadThread extends Thread
 
 				File file = new File(dir, path);
 
-				File musicFolder = new File(dir, "music");
-
 				if(!file.exists() || file.length() != size)
 				{
 					try {
@@ -121,13 +120,6 @@ public class ResourceDownloadThread extends Thread
 					}
 				}
 
-				File minecraftOGG = new File(musicFolder, "minecraft.ogg");
-				File clarkOGG = new File(musicFolder, "clark.ogg");
-				File swedenOGG = new File(musicFolder, "sweden.ogg");
-
-				minecraftOGG.renameTo(new File(musicFolder, "calm1.ogg"));
-				clarkOGG.renameTo(new File(musicFolder, "calm2.ogg"));
-				swedenOGG.renameTo(new File(musicFolder, "calm3.ogg"));
 			}
 
 			File soundsFolder = dir;
@@ -141,7 +133,21 @@ public class ResourceDownloadThread extends Thread
 				minecraft.sound.registerSound(new File(stepsFolder, "wood" + i + ".ogg"), "step/wood" + i + ".ogg");
 			}
 
-			File musicFolder = new File(dir, "music");
+			File minecraftOGG = new File(musicFolder, "minecraft.ogg");
+			File clarkOGG = new File(musicFolder, "clark.ogg");
+			File swedenOGG = new File(musicFolder, "sweden.ogg");
+
+			File calm1OGG = new File(musicFolder, "calm1.ogg");
+			File calm2OGG = new File(musicFolder, "calm2.ogg");
+			File calm3OGG = new File(musicFolder, "calm3.ogg");
+
+			if (minecraftOGG.exists() && ! calm1OGG.exists()) { minecraftOGG.renameTo(calm1OGG); }
+			if (clarkOGG    .exists() && ! calm2OGG.exists()) { clarkOGG    .renameTo(calm2OGG); }
+			if (swedenOGG   .exists() && ! calm3OGG.exists()) { swedenOGG   .renameTo(calm3OGG); }
+
+			if (!calm1OGG.exists()) {download("music" + File.separator + "calm1.ogg", null, baseSoundsSourceDir, calm1OGG, -1);}
+			if (!calm2OGG.exists()) {download("music" + File.separator + "calm2.ogg", null, baseSoundsSourceDir, calm2OGG, -1);}
+			if (!calm3OGG.exists()) {download("music" + File.separator + "calm3.ogg", null, baseSoundsSourceDir, calm3OGG, -1);}
 
 			for(int i = 1; i <= 3; i++)
 			{
@@ -206,6 +212,13 @@ public class ResourceDownloadThread extends Thread
 	}
 
 	private boolean downloadLocalFile(File base, String path, File file, int size) {
+		if (base == null || path == null || file == null) {
+			return false;
+		}
+		File parent = file.getParentFile();
+		if (!parent.exists() && ! parent.mkdirs()) {
+			return false;
+		}
 		boolean success = true;
 		System.out.print("INFO:  Downloading: " + file.getName() + " from \"" + base.getAbsolutePath() + "\" ...");
 		DataInputStream in = null;
@@ -257,6 +270,9 @@ public class ResourceDownloadThread extends Thread
 	}
 
 	private boolean downloadUrl(URL base, String path, File file, int size) throws MalformedURLException {
+		if (base == null || path == null || file == null) {
+			return false;
+		}
 		boolean success = true;
 		URL url = new URL(base, path.replaceAll(" ", "%20"));
 		System.out.print("INFO:  Downloading: " + file.getName() + " from \"" + url.toString() + "\" ...");

@@ -23,12 +23,12 @@ public final class Music implements Audio {
    boolean stopped = false;
 
 
-   public Music(SoundPlayer var1, URL var2) {
-      this.player = var1;
+   public Music(SoundPlayer player, URL url) {
+      this.player = player;
 	   try
 	   {
-		   LogicalOggStreamImpl var3 = (LogicalOggStreamImpl)(new OnDemandUrlStream(var2)).getLogicalStreams().iterator().next();
-		   this.stream = new VorbisStream(var3);
+		   LogicalOggStreamImpl ogg = (LogicalOggStreamImpl)(new OnDemandUrlStream(url)).getLogicalStreams().iterator().next();
+		   this.stream = new VorbisStream(ogg);
 	   } catch (VorbisFormatException e) {
 		   e.printStackTrace();
 	   } catch (OggFormatException e) {
