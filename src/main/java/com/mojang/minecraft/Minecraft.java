@@ -56,7 +56,8 @@ import java.util.List;
 
 public final class Minecraft implements Runnable {
 
-   public GameMode gamemode = new SurvivalGameMode(this);
+//   public GameMode gamemode = new SurvivalGameMode(this);
+   public GameMode gamemode = new CreativeGameMode(this);
    private boolean fullscreen = false;
    public int width;
    public int height;
@@ -100,7 +101,7 @@ public final class Minecraft implements Runnable {
    public boolean raining;
 
 
-   public Minecraft(Canvas var1, MinecraftApplet var2, int var3, int var4, boolean var5) {
+   public Minecraft(Canvas canvas, MinecraftApplet applet, int width, int height, boolean fullscreen) {
       this.levelIo = new LevelIO(this.progressBar);
       this.sound = new SoundManager();
       this.ticks = 0;
@@ -124,13 +125,13 @@ public final class Minecraft implements Runnable {
          var7.printStackTrace();
       }
 
-      this.applet = var2;
+      this.applet = applet;
       new SleepForeverThread(this);
-      this.canvas = var1;
-      this.width = var3;
-      this.height = var4;
-      this.fullscreen = var5;
-      if(var1 != null) {
+      this.canvas = canvas;
+      this.width = width;
+      this.height = height;
+      this.fullscreen = fullscreen;
+      if(canvas != null) {
          try {
             this.robot = new Robot();
             return;
@@ -138,7 +139,7 @@ public final class Minecraft implements Runnable {
             var8.printStackTrace();
          }
       }
-
+      this.gamemode = new CreativeGameMode(this);
    }
 
    public final void setCurrentScreen(GuiScreen var1) {

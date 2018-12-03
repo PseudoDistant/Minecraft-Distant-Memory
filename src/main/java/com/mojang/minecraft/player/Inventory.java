@@ -15,10 +15,16 @@ public class Inventory implements Serializable {
 
 
    public Inventory() {
-      for(int var1 = 0; var1 < 9; ++var1) {
-         this.slots[var1] = -1;
-         this.count[var1] = 0;
+      for(int i = 0; i < 9; ++i) {
+         this.slots[i] = -1;
+         this.count[i] = 0;
       }
+this.slots[0] = 3; this.count[0] = 99;
+this.slots[1] = 37; this.count[1] = 99;
+this.slots[2] = 38; this.count[2] = 99;
+this.slots[3] = 39; this.count[3] = 99;
+this.slots[4] = 40; this.count[4] = 99;
+
 
    }
 
@@ -26,23 +32,23 @@ public class Inventory implements Serializable {
       return this.slots[this.selected];
    }
 
-   private int getSlot(int var1) {
-      for(int var2 = 0; var2 < this.slots.length; ++var2) {
-         if(var1 == this.slots[var2]) {
-            return var2;
+   private int getSlot(int resource) {
+      for(int i = 0; i < this.slots.length; ++i) {
+         if(resource == this.slots[i]) {
+            return i;
          }
       }
 
       return -1;
    }
 
-   public void grabTexture(int var1, boolean var2) {
+   public void grabTexture(int block, boolean isCreativeMode) {
       int var3;
-      if((var3 = this.getSlot(var1)) >= 0) {
+      if((var3 = this.getSlot(block)) >= 0) {
          this.selected = var3;
       } else {
-         if(var2 && var1 > 0 && SessionData.allowedBlocks.contains(Block.blocks[var1])) {
-            this.replaceSlot(Block.blocks[var1]);
+         if(isCreativeMode && block > 0 && SessionData.allowedBlocks.contains(Block.blocks[block])) {
+            this.replaceSlot(Block.blocks[block]);
          }
 
       }
@@ -86,39 +92,39 @@ public class Inventory implements Serializable {
 
    }
 
-   public boolean addResource(int var1) {
-      int var2;
-      if((var2 = this.getSlot(var1)) < 0) {
-         var2 = this.getSlot(-1);
+   public boolean addResource(int resource) {
+      int slot;
+      if((slot = this.getSlot(resource)) < 0) {
+         slot = this.getSlot(-1);
       }
 
-      if(var2 < 0) {
+      if(slot < 0) {
          return false;
-      } else if(this.count[var2] >= 99) {
+      } else if(this.count[slot] >= 99) {
          return false;
       } else {
-         this.slots[var2] = var1;
-         ++this.count[var2];
-         this.popTime[var2] = 5;
+         this.slots[slot] = resource;
+         ++this.count[slot];
+         this.popTime[slot] = 5;
          return true;
       }
    }
 
    public void tick() {
-      for(int var1 = 0; var1 < this.popTime.length; ++var1) {
-         if(this.popTime[var1] > 0) {
-            --this.popTime[var1];
+      for(int i = 0; i < this.popTime.length; ++i) {
+         if(this.popTime[i] > 0) {
+            --this.popTime[i];
          }
       }
 
    }
 
-   public boolean removeResource(int var1) {
-      if((var1 = this.getSlot(var1)) < 0) {
+   public boolean removeResource(int resource) {
+      if((resource = this.getSlot(resource)) < 0) {
          return false;
       } else {
-         if(--this.count[var1] <= 0) {
-            this.slots[var1] = -1;
+         if(--this.count[resource] <= 0) {
+            this.slots[resource] = -1;
          }
 
          return true;

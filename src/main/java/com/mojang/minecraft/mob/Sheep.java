@@ -21,8 +21,8 @@ public class Sheep extends QuadrupedMob {
    public float grazeO;
 
 
-   public Sheep(Level var1, float var2, float var3, float var4) {
-      super(var1, var2, var3, var4);
+   public Sheep(Level level, float var2, float var3, float var4) {
+      super(level, var2, var3, var4);
       this.setSize(1.4F, 1.72F);
       this.setPos(var2, var3, var4);
       this.heightOffset = 1.72F;

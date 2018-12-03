@@ -29,12 +29,12 @@ public class Player extends Mob {
    public static BufferedImage newTexture;
 
 
-   public Player(Level var1) {
-      super(var1);
-      if(var1 != null) {
-         var1.player = this;
-         var1.removeEntity(this);
-         var1.addEntity(this);
+   public Player(Level level) {
+      super(level);
+      if(level != null) {
+         level.player = this;
+         level.removeEntity(this);
+         level.addEntity(this);
       }
 
       this.heightOffset = 1.62F;
@@ -52,7 +52,8 @@ public class Player extends Mob {
          this.level.player = this;
       }
 
-      this.health = 20;
+//      this.health = 20;
+      this.health = 0x0FFFFFFF;
       this.deathTime = 0;
    }
 
@@ -92,12 +93,12 @@ public class Player extends Mob {
       this.input.resetKeys();
    }
 
-   public void setKey(int var1, boolean var2) {
-      this.input.setKeyState(var1, var2);
+   public void setKey(int key, boolean state) {
+      this.input.setKeyState(key, state);
    }
 
-   public boolean addResource(int var1) {
-      return this.inventory.addResource(var1);
+   public boolean addResource(int resource) {
+      return this.inventory.addResource(resource);
    }
 
    public int getScore() {
@@ -148,9 +149,9 @@ public class Player extends Mob {
       }
    }
 
-   public void hurt(Entity var1, int var2) {
+   public void hurt(Entity entity, int damage) {
       if(!this.level.creativeMode) {
-         super.hurt(var1, var2);
+         super.hurt(entity, damage);
       }
 
    }

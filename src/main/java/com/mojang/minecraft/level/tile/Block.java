@@ -422,17 +422,17 @@ public class Block
 		this.dropItems(var1, var2, var3, var4, 1.0F);
 	}
 
-	public void dropItems(Level var1, int var2, int var3, int var4, float var5) {
-		if(!var1.creativeMode) {
-			int var6 = this.getDropCount();
+	public void dropItems(Level level, int x, int y, int z, float probability) {
+		if(!level.creativeMode) {
+			int dropCount = this.getDropCount();
 
-			for(int var7 = 0; var7 < var6; ++var7) {
-				if(random.nextFloat() <= var5) {
-					float var8 = 0.7F;
-					float var9 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-					float var10 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-					var8 = random.nextFloat() * var8 + (1.0F - var8) * 0.5F;
-					var1.addEntity(new Item(var1, (float)var2 + var9, (float)var3 + var10, (float)var4 + var8, this.getDrop()));
+			for(int i = 0; i < dropCount; ++i) {
+				if(random.nextFloat() <= probability) {
+					float randFactor = 0.7F;
+					float randOne = random.nextFloat() * randFactor + (1.0F - randFactor) * 0.5F;
+					float randTwo = random.nextFloat() * randFactor + (1.0F - randFactor) * 0.5F;
+					randFactor = random.nextFloat() * randFactor + (1.0F - randFactor) * 0.5F;
+					level.addEntity(new Item(level, (float)x + randOne, (float)y + randTwo, (float)z + randFactor, this.getDrop()));
 				}
 			}
 

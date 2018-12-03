@@ -10,9 +10,9 @@ import org.lwjgl.opengl.GL11;
 
 public class Item extends Entity
 {
-	public Item(Level level1, float x, float y, float z, int block)
+	public Item(Level level, float x, float y, float z, int block)
 	{
-		super(level1);
+		super(level);
 
 		setSize(0.25F, 0.25F);
 

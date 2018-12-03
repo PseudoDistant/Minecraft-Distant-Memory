@@ -148,7 +148,7 @@ public class LiquidBlock extends Block {
       return this.type == LiquidType.LAVA?5:0;
    }
 
-   public final void dropItems(Level var1, int var2, int var3, int var4, float var5) {}
+   public final void dropItems(Level level, int x, int var3, int z, float probability) {}
 
    public final void onBreak(Level var1, int var2, int var3, int var4) {}
 

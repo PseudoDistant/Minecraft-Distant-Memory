@@ -107,13 +107,13 @@ public abstract class Entity implements Serializable {
       this.xRot = var2;
    }
 
-   public void setPos(float var1, float var2, float var3) {
-      this.x = var1;
-      this.y = var2;
-      this.z = var3;
-      float var4 = this.bbWidth / 2.0F;
-      float var5 = this.bbHeight / 2.0F;
-      this.bb = new AABB(var1 - var4, var2 - var5, var3 - var4, var1 + var4, var2 + var5, var3 + var4);
+   public void setPos(float x, float y, float z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      float bbwidth = this.bbWidth / 2.0F;
+      float bbheight = this.bbHeight / 2.0F;
+      this.bb = new AABB(x - bbwidth, y - bbheight, z - bbwidth, x + bbwidth, y + bbheight, z + bbwidth);
    }
 
    public void turn(float var1, float var2) {

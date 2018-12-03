@@ -19,11 +19,11 @@ public final class TNTBlock extends Block {
       return 0;
    }
 
-   public final void explode(Level var1, int var2, int var3, int var4) {
-      if(!var1.creativeMode) {
+   public final void explode(Level level, int var2, int var3, int var4) {
+      if(!level.creativeMode) {
          PrimedTnt var5;
-         (var5 = new PrimedTnt(var1, (float)var2 + 0.5F, (float)var3 + 0.5F, (float)var4 + 0.5F)).life = random.nextInt(var5.life / 4) + var5.life / 8;
-         var1.addEntity(var5);
+         (var5 = new PrimedTnt(level, (float)var2 + 0.5F, (float)var3 + 0.5F, (float)var4 + 0.5F)).life = random.nextInt(var5.life / 4) + var5.life / 8;
+         level.addEntity(var5);
       }
 
    }
