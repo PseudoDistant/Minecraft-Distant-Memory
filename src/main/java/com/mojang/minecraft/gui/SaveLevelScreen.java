@@ -13,11 +13,11 @@ public final class SaveLevelScreen extends LoadLevelScreen {
 
    public final void onOpen() {
       super.onOpen();
-      ((Button)this.buttons.get(5)).text = "Save file...";
+      ((Button)this.buttons.get(BTN_SAVE_LOAD)).text = "Save file...";
    }
 
    protected final void setLevels(String[] var1) {
-      for(int i = 0; i < 5; ++i) {
+      for(int i = 0; i < NUM_ONLINE_LEVELS; ++i) {
          ((Button)this.buttons.get(i)).text = var1[i];
          ((Button)this.buttons.get(i)).visible = true;
          ((Button)this.buttons.get(i)).active = this.minecraft.session.haspaid;

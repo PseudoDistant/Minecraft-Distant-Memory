@@ -57,8 +57,7 @@ import java.util.Random;
 
 public final class Minecraft implements Runnable {
 
-   public GameMode gamemode = new SurvivalGameMode(this);
-//   public GameMode gamemode = new CreativeGameMode(this);
+   public GameMode gamemode = new CreativeGameMode(this);
    private boolean fullscreen = false;
    public int width;
    public int height;
@@ -103,8 +102,7 @@ public final class Minecraft implements Runnable {
 
 
    public Minecraft(Canvas canvas, MinecraftApplet applet, int width, int height, boolean fullscreen) {
-      this.gamemode = new CreativeGameMode(this);
-      this.session = new SessionData(getUserName(), "" + (new Random().nextInt(Integer.MAX_VALUE - 1)));
+      this.session = new SessionData(getUserName(), generateSessionId());
       this.levelIo = new LevelIO(this.progressBar);
       this.sound = new SoundManager();
       this.ticks = 0;
@@ -304,6 +302,7 @@ public final class Minecraft implements Runnable {
 
          File var2 = workDir;
          this.settings = new GameSettings(this, workDir);
+         this.gamemode = this.settings.creativeMode ? new CreativeGameMode(this) : new SurvivalGameMode(this);
          this.textureManager = new TextureManager(this.settings);
          this.textureManager.registerAnimation(new TextureLavaFX());
          this.textureManager.registerAnimation(new TextureWaterFX());
@@ -447,30 +446,30 @@ public final class Minecraft implements Runnable {
                   if(!this.online) {
                      this.gamemode.applyCracks(this.timer.delta);
                      float var65 = this.timer.delta;
-                     Renderer var66 = this.renderer;
+                     Renderer render = this.renderer;
                      if(this.renderer.displayActive && !Display.isActive()) {
-                        var66.minecraft.pause();
+                        render.minecraft.pause();
                      }
 
-                     var66.displayActive = Display.isActive();
+                     render.displayActive = Display.isActive();
                      int var68;
                      int var70;
                      int var86;
                      int var81;
-                     if(var66.minecraft.hasMouse) {
+                     if(render.minecraft.hasMouse) {
                         var81 = 0;
                         var86 = 0;
-                        if(var66.minecraft.levelLoaded) {
-                           if(var66.minecraft.canvas != null) {
+                        if(render.minecraft.levelLoaded) {
+                           if(render.minecraft.canvas != null) {
                               Point var90;
-                              var70 = (var90 = var66.minecraft.canvas.getLocationOnScreen()).x + var66.minecraft.width / 2;
-                              var68 = var90.y + var66.minecraft.height / 2;
+                              var70 = (var90 = render.minecraft.canvas.getLocationOnScreen()).x + render.minecraft.width / 2;
+                              var68 = var90.y + render.minecraft.height / 2;
                               Point var75;
                               var81 = (var75 = MouseInfo.getPointerInfo().getLocation()).x - var70;
                               var86 = -(var75.y - var68);
-                              var66.minecraft.robot.mouseMove(var70, var68);
+                              render.minecraft.robot.mouseMove(var70, var68);
                            } else {
-                              Mouse.setCursorPosition(var66.minecraft.width / 2, var66.minecraft.height / 2);
+                              Mouse.setCursorPosition(render.minecraft.width / 2, render.minecraft.height / 2);
                            }
                         } else {
                            var81 = Mouse.getDX();
@@ -478,60 +477,60 @@ public final class Minecraft implements Runnable {
                         }
 
                         byte var91 = 1;
-                        if(var66.minecraft.settings.invertMouse) {
+                        if(render.minecraft.settings.invertMouse) {
                            var91 = -1;
                         }
 
-                        var66.minecraft.player.turn((float)var81, (float)(var86 * var91));
+                        render.minecraft.player.turn((float)var81, (float)(var86 * var91));
                      }
 
-                     if(!var66.minecraft.online) {
-                        var81 = var66.minecraft.width * 240 / var66.minecraft.height;
-                        var86 = var66.minecraft.height * 240 / var66.minecraft.height;
-                        int var94 = Mouse.getX() * var81 / var66.minecraft.width;
-                        var70 = var86 - Mouse.getY() * var86 / var66.minecraft.height - 1;
-                        if(var66.minecraft.level != null) {
+                     if(!render.minecraft.online) {
+                        var81 = render.minecraft.width * 240 / render.minecraft.height;
+                        var86 = render.minecraft.height * 240 / render.minecraft.height;
+                        int var94 = Mouse.getX() * var81 / render.minecraft.width;
+                        var70 = var86 - Mouse.getY() * var86 / render.minecraft.height - 1;
+                        if(render.minecraft.level != null) {
                            float var80 = var65;
-                           Renderer var82 = var66;
-                           Renderer var27 = var66;
+                           Renderer var82 = render;
+                           Renderer var27 = render;
                            Player var28;
-                           float var29 = (var28 = var66.minecraft.player).xRotO + (var28.xRot - var28.xRotO) * var65;
+                           float var29 = (var28 = render.minecraft.player).xRotO + (var28.xRot - var28.xRotO) * var65;
                            float var30 = var28.yRotO + (var28.yRot - var28.yRotO) * var65;
-                           Vec3D var31 = var66.getPlayerVector(var65);
+                           Vec3D var31 = render.getPlayerVector(var65);
                            float var32 = MathHelper.cos(-var30 * 0.017453292F - 3.1415927F);
                            float var69 = MathHelper.sin(-var30 * 0.017453292F - 3.1415927F);
-                           float var74 = MathHelper.cos(-var29 * 0.017453292F);
+                           float survivalReachDistance = MathHelper.cos(-var29 * 0.017453292F);
                            float var33 = MathHelper.sin(-var29 * 0.017453292F);
-                           float var34 = var69 * var74;
-                           float var87 = var32 * var74;
-                           float var36 = var66.minecraft.gamemode.getReachDistance();
-                           Vec3D var71 = var31.add(var34 * var36, var33 * var36, var87 * var36);
-                           var66.minecraft.selected = var66.minecraft.level.clip(var31, var71);
-                           var74 = var36;
-                           if(var66.minecraft.selected != null) {
-                              var74 = var66.minecraft.selected.vec.distance(var66.getPlayerVector(var65));
+                           float var34 = var69 * survivalReachDistance;
+                           float var87 = var32 * survivalReachDistance;
+                           float reachDistance = render.minecraft.gamemode.getReachDistance();
+                           Vec3D var71 = var31.add(var34 * reachDistance, var33 * reachDistance, var87 * reachDistance);
+                           render.minecraft.selected = render.minecraft.level.clip(var31, var71);
+                           survivalReachDistance = reachDistance;
+                           if(render.minecraft.selected != null) {
+                              survivalReachDistance = render.minecraft.selected.vec.distance(render.getPlayerVector(var65));
                            }
 
-                           var31 = var66.getPlayerVector(var65);
-                           if(var66.minecraft.gamemode instanceof CreativeGameMode) {
-                              var36 = 32.0F;
+                           var31 = render.getPlayerVector(var65);
+                           if(render.minecraft.gamemode instanceof CreativeGameMode) {
+                              reachDistance = 32.0F;
                            } else {
-                              var36 = var74;
+                              reachDistance = survivalReachDistance;
                            }
 
-                           var71 = var31.add(var34 * var36, var33 * var36, var87 * var36);
-                           var66.entity = null;
-                           List var37 = var66.minecraft.level.blockMap.getEntities(var28, var28.bb.expand(var34 * var36, var33 * var36, var87 * var36));
+                           var71 = var31.add(var34 * reachDistance, var33 * reachDistance, var87 * reachDistance);
+                           render.entity = null;
+                           List var37 = render.minecraft.level.blockMap.getEntities(var28, var28.bb.expand(var34 * reachDistance, var33 * reachDistance, var87 * reachDistance));
                            float var35 = 0.0F;
 
                            for(var81 = 0; var81 < var37.size(); ++var81) {
                               Entity var88;
                               if((var88 = (Entity)var37.get(var81)).isPickable()) {
-                                 var74 = 0.1F;
+                                 survivalReachDistance = 0.1F;
                                  MovingObjectPosition var78;
-                                 if((var78 = var88.bb.grow(var74, var74, var74).clip(var31, var71)) != null && ((var74 = var31.distance(var78.vec)) < var35 || var35 == 0.0F)) {
+                                 if((var78 = var88.bb.grow(survivalReachDistance, survivalReachDistance, survivalReachDistance).clip(var31, var71)) != null && ((survivalReachDistance = var31.distance(var78.vec)) < var35 || var35 == 0.0F)) {
                                     var27.entity = var88;
-                                    var35 = var74;
+                                    var35 = survivalReachDistance;
                                  }
                               }
                            }
@@ -592,10 +591,10 @@ public final class Minecraft implements Runnable {
                               }
 
                               if(var82.minecraft.settings.anaglyph) {
-                                 var74 = (var82.fogRed * 30.0F + var82.fogBlue * 59.0F + var82.fogGreen * 11.0F) / 100.0F;
+                                 survivalReachDistance = (var82.fogRed * 30.0F + var82.fogBlue * 59.0F + var82.fogGreen * 11.0F) / 100.0F;
                                  var33 = (var82.fogRed * 30.0F + var82.fogBlue * 70.0F) / 100.0F;
                                  var34 = (var82.fogRed * 30.0F + var82.fogGreen * 70.0F) / 100.0F;
-                                 var82.fogRed = var74;
+                                 var82.fogRed = survivalReachDistance;
                                  var82.fogBlue = var33;
                                  var82.fogGreen = var34;
                               }
@@ -615,8 +614,8 @@ public final class Minecraft implements Runnable {
                               Player var116 = var82.minecraft.player;
                               var69 = 70.0F;
                               if(var116.health <= 0) {
-                                 var74 = (float)var116.deathTime + var80;
-                                 var69 /= (1.0F - 500.0F / (var74 + 500.0F)) * 2.0F + 1.0F;
+                                 survivalReachDistance = (float)var116.deathTime + var80;
+                                 var69 /= (1.0F - 500.0F / (survivalReachDistance + 500.0F)) * 2.0F + 1.0F;
                               }
 
                               GLU.gluPerspective(var69, (float)var82.minecraft.width / (float)var82.minecraft.height, 0.05F, var82.fogEnd);
@@ -636,9 +635,9 @@ public final class Minecraft implements Runnable {
                               GL11.glRotatef(var116.xRotO + (var116.xRot - var116.xRotO) * var80, 1.0F, 0.0F, 0.0F);
                               GL11.glRotatef(var116.yRotO + (var116.yRot - var116.yRotO) * var80, 0.0F, 1.0F, 0.0F);
                               var69 = var116.xo + (var116.x - var116.xo) * var80;
-                              var74 = var116.yo + (var116.y - var116.yo) * var80;
+                              survivalReachDistance = var116.yo + (var116.y - var116.yo) * var80;
                               var33 = var116.zo + (var116.z - var116.zo) * var80;
-                              GL11.glTranslatef(-var69, -var74, -var33);
+                              GL11.glTranslatef(-var69, -survivalReachDistance, -var33);
                               Frustrum var76 = FrustrumImpl.update();
                               Frustrum var100 = var76;
                               LevelRenderer var101 = var82.minecraft.levelRenderer;
@@ -766,9 +765,9 @@ public final class Minecraft implements Runnable {
                               }
 
                               var115 = ShapeRenderer.instance;
-                              var74 = 0.0F;
+                              survivalReachDistance = 0.0F;
                               var33 = 4.8828125E-4F;
-                              var74 = (float)(var89.level.depth + 2);
+                              survivalReachDistance = (float)(var89.level.depth + 2);
                               var34 = ((float)var89.ticks + var80) * var33 * 0.03F;
                               var35 = 0.0F;
                               var115.begin();
@@ -776,14 +775,14 @@ public final class Minecraft implements Runnable {
 
                               for(var86 = -2048; var86 < var101.level.width + 2048; var86 += 512) {
                                  for(var125 = -2048; var125 < var101.level.height + 2048; var125 += 512) {
-                                    var115.vertexUV((float)var86, var74, (float)(var125 + 512), (float)var86 * var33 + var34, (float)(var125 + 512) * var33);
-                                    var115.vertexUV((float)(var86 + 512), var74, (float)(var125 + 512), (float)(var86 + 512) * var33 + var34, (float)(var125 + 512) * var33);
-                                    var115.vertexUV((float)(var86 + 512), var74, (float)var125, (float)(var86 + 512) * var33 + var34, (float)var125 * var33);
-                                    var115.vertexUV((float)var86, var74, (float)var125, (float)var86 * var33 + var34, (float)var125 * var33);
-                                    var115.vertexUV((float)var86, var74, (float)var125, (float)var86 * var33 + var34, (float)var125 * var33);
-                                    var115.vertexUV((float)(var86 + 512), var74, (float)var125, (float)(var86 + 512) * var33 + var34, (float)var125 * var33);
-                                    var115.vertexUV((float)(var86 + 512), var74, (float)(var125 + 512), (float)(var86 + 512) * var33 + var34, (float)(var125 + 512) * var33);
-                                    var115.vertexUV((float)var86, var74, (float)(var125 + 512), (float)var86 * var33 + var34, (float)(var125 + 512) * var33);
+                                    var115.vertexUV((float)var86, survivalReachDistance, (float)(var125 + 512), (float)var86 * var33 + var34, (float)(var125 + 512) * var33);
+                                    var115.vertexUV((float)(var86 + 512), survivalReachDistance, (float)(var125 + 512), (float)(var86 + 512) * var33 + var34, (float)(var125 + 512) * var33);
+                                    var115.vertexUV((float)(var86 + 512), survivalReachDistance, (float)var125, (float)(var86 + 512) * var33 + var34, (float)var125 * var33);
+                                    var115.vertexUV((float)var86, survivalReachDistance, (float)var125, (float)var86 * var33 + var34, (float)var125 * var33);
+                                    var115.vertexUV((float)var86, survivalReachDistance, (float)var125, (float)var86 * var33 + var34, (float)var125 * var33);
+                                    var115.vertexUV((float)(var86 + 512), survivalReachDistance, (float)var125, (float)(var86 + 512) * var33 + var34, (float)var125 * var33);
+                                    var115.vertexUV((float)(var86 + 512), survivalReachDistance, (float)(var125 + 512), (float)(var86 + 512) * var33 + var34, (float)(var125 + 512) * var33);
+                                    var115.vertexUV((float)var86, survivalReachDistance, (float)(var125 + 512), (float)var86 * var33 + var34, (float)(var125 + 512) * var33);
                                  }
                               }
 
@@ -794,23 +793,23 @@ public final class Minecraft implements Runnable {
                               var35 = (float)(var101.level.skyColor >> 8 & 255) / 255.0F;
                               var87 = (float)(var101.level.skyColor & 255) / 255.0F;
                               if(var101.minecraft.settings.anaglyph) {
-                                 var36 = (var34 * 30.0F + var35 * 59.0F + var87 * 11.0F) / 100.0F;
+                                 reachDistance = (var34 * 30.0F + var35 * 59.0F + var87 * 11.0F) / 100.0F;
                                  var69 = (var34 * 30.0F + var35 * 70.0F) / 100.0F;
-                                 var74 = (var34 * 30.0F + var87 * 70.0F) / 100.0F;
-                                 var34 = var36;
+                                 survivalReachDistance = (var34 * 30.0F + var87 * 70.0F) / 100.0F;
+                                 var34 = reachDistance;
                                  var35 = var69;
-                                 var87 = var74;
+                                 var87 = survivalReachDistance;
                               }
 
                               var115.color(var34, var35, var87);
-                              var74 = (float)(var101.level.depth + 10);
+                              survivalReachDistance = (float)(var101.level.depth + 10);
 
                               for(var125 = -2048; var125 < var101.level.width + 2048; var125 += 512) {
                                  for(var68 = -2048; var68 < var101.level.height + 2048; var68 += 512) {
-                                    var115.vertex((float)var125, var74, (float)var68);
-                                    var115.vertex((float)(var125 + 512), var74, (float)var68);
-                                    var115.vertex((float)(var125 + 512), var74, (float)(var68 + 512));
-                                    var115.vertex((float)var125, var74, (float)(var68 + 512));
+                                    var115.vertex((float)var125, survivalReachDistance, (float)var68);
+                                    var115.vertex((float)(var125 + 512), survivalReachDistance, (float)var68);
+                                    var115.vertex((float)(var125 + 512), survivalReachDistance, (float)(var68 + 512));
+                                    var115.vertex((float)var125, survivalReachDistance, (float)(var68 + 512));
                                  }
                               }
 
@@ -838,13 +837,13 @@ public final class Minecraft implements Runnable {
                                     GL11.glPushMatrix();
                                     Block var10000 = (var114 = var89.level.getTile(var102.x, var102.y, var102.z)) > 0?Block.blocks[var114]:null;
                                     var73 = var10000;
-                                    var74 = (var10000.x1 + var73.x2) / 2.0F;
+                                    survivalReachDistance = (var10000.x1 + var73.x2) / 2.0F;
                                     var33 = (var73.y1 + var73.y2) / 2.0F;
                                     var34 = (var73.z1 + var73.z2) / 2.0F;
-                                    GL11.glTranslatef((float)var102.x + var74, (float)var102.y + var33, (float)var102.z + var34);
+                                    GL11.glTranslatef((float)var102.x + survivalReachDistance, (float)var102.y + var33, (float)var102.z + var34);
                                     var35 = 1.01F;
                                     GL11.glScalef(1.01F, var35, var35);
-                                    GL11.glTranslatef(-((float)var102.x + var74), -((float)var102.y + var33), -((float)var102.z + var34));
+                                    GL11.glTranslatef(-((float)var102.x + survivalReachDistance), -((float)var102.y + var33), -((float)var102.z + var34));
                                     var113.begin();
                                     var113.noColor();
                                     GL11.glDepthMask(false);
@@ -964,20 +963,20 @@ public final class Minecraft implements Runnable {
                                        }
 
                                        if(var86 != var125) {
-                                          var74 = ((float)((var27.levelTicks + var110 * 3121 + var122 * 418711) % 32) + var97) / 32.0F;
+                                          survivalReachDistance = ((float)((var27.levelTicks + var110 * 3121 + var122 * 418711) % 32) + var97) / 32.0F;
                                           float var124 = (float)var110 + 0.5F - var28.x;
                                           var35 = (float)var122 + 0.5F - var28.z;
                                           float var92 = MathHelper.sqrt(var124 * var124 + var35 * var35) / (float)5;
                                           GL11.glColor4f(1.0F, 1.0F, 1.0F, (1.0F - var92 * var92) * 0.7F);
                                           var84.begin();
-                                          var84.vertexUV((float)var110, (float)var86, (float)var122, 0.0F, (float)var86 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)(var110 + 1), (float)var86, (float)(var122 + 1), 2.0F, (float)var86 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)(var110 + 1), (float)var125, (float)(var122 + 1), 2.0F, (float)var125 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)var110, (float)var125, (float)var122, 0.0F, (float)var125 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)var110, (float)var86, (float)(var122 + 1), 0.0F, (float)var86 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)(var110 + 1), (float)var86, (float)var122, 2.0F, (float)var86 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)(var110 + 1), (float)var125, (float)var122, 2.0F, (float)var125 * 2.0F / 8.0F + var74 * 2.0F);
-                                          var84.vertexUV((float)var110, (float)var125, (float)(var122 + 1), 0.0F, (float)var125 * 2.0F / 8.0F + var74 * 2.0F);
+                                          var84.vertexUV((float)var110, (float)var86, (float)var122, 0.0F, (float)var86 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)(var110 + 1), (float)var86, (float)(var122 + 1), 2.0F, (float)var86 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)(var110 + 1), (float)var125, (float)(var122 + 1), 2.0F, (float)var125 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)var110, (float)var125, (float)var122, 0.0F, (float)var125 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)var110, (float)var86, (float)(var122 + 1), 0.0F, (float)var86 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)(var110 + 1), (float)var86, (float)var122, 2.0F, (float)var86 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)(var110 + 1), (float)var125, (float)var122, 2.0F, (float)var125 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
+                                          var84.vertexUV((float)var110, (float)var125, (float)(var122 + 1), 0.0F, (float)var125 * 2.0F / 8.0F + survivalReachDistance * 2.0F);
                                           var84.end();
                                        }
                                     }
@@ -1013,20 +1012,20 @@ public final class Minecraft implements Runnable {
                               GL11.glPushMatrix();
                               var69 = 0.8F;
                               if(var112.moving) {
-                                 var33 = MathHelper.sin((var74 = ((float)var112.offset + var80) / 7.0F) * 3.1415927F);
-                                 GL11.glTranslatef(-MathHelper.sin(MathHelper.sqrt(var74) * 3.1415927F) * 0.4F, MathHelper.sin(MathHelper.sqrt(var74) * 3.1415927F * 2.0F) * 0.2F, -var33 * 0.2F);
+                                 var33 = MathHelper.sin((survivalReachDistance = ((float)var112.offset + var80) / 7.0F) * 3.1415927F);
+                                 GL11.glTranslatef(-MathHelper.sin(MathHelper.sqrt(survivalReachDistance) * 3.1415927F) * 0.4F, MathHelper.sin(MathHelper.sqrt(survivalReachDistance) * 3.1415927F * 2.0F) * 0.2F, -var33 * 0.2F);
                               }
 
                               GL11.glTranslatef(0.7F * var69, -0.65F * var69 - (1.0F - var117) * 0.6F, -0.9F * var69);
                               GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
                               GL11.glEnable(2977);
                               if(var112.moving) {
-                                 var33 = MathHelper.sin((var74 = ((float)var112.offset + var80) / 7.0F) * var74 * 3.1415927F);
-                                 GL11.glRotatef(MathHelper.sin(MathHelper.sqrt(var74) * 3.1415927F) * 80.0F, 0.0F, 1.0F, 0.0F);
+                                 var33 = MathHelper.sin((survivalReachDistance = ((float)var112.offset + var80) / 7.0F) * survivalReachDistance * 3.1415927F);
+                                 GL11.glRotatef(MathHelper.sin(MathHelper.sqrt(survivalReachDistance) * 3.1415927F) * 80.0F, 0.0F, 1.0F, 0.0F);
                                  GL11.glRotatef(-var33 * 20.0F, 1.0F, 0.0F, 0.0F);
                               }
 
-                              GL11.glColor4f(var74 = var112.minecraft.level.getBrightness((int)var116.x, (int)var116.y, (int)var116.z), var74, var74, 1.0F);
+                              GL11.glColor4f(survivalReachDistance = var112.minecraft.level.getBrightness((int)var116.x, (int)var116.y, (int)var116.z), survivalReachDistance, survivalReachDistance, 1.0F);
                               ShapeRenderer var123 = ShapeRenderer.instance;
                               if(var112.block != null) {
                                  var34 = 0.4F;
@@ -1059,20 +1058,20 @@ public final class Minecraft implements Runnable {
                               ++var77;
                            }
 
-                           var66.minecraft.hud.render(var65, var66.minecraft.currentScreen != null, var94, var70);
+                           render.minecraft.hud.render(var65, render.minecraft.currentScreen != null, var94, var70);
                         } else {
-                           GL11.glViewport(0, 0, var66.minecraft.width, var66.minecraft.height);
+                           GL11.glViewport(0, 0, render.minecraft.width, render.minecraft.height);
                            GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
                            GL11.glClear(16640);
                            GL11.glMatrixMode(5889);
                            GL11.glLoadIdentity();
                            GL11.glMatrixMode(5888);
                            GL11.glLoadIdentity();
-                           var66.enableGuiMode();
+                           render.enableGuiMode();
                         }
 
-                        if(var66.minecraft.currentScreen != null) {
-                           var66.minecraft.currentScreen.render(var94, var70);
+                        if(render.minecraft.currentScreen != null) {
+                           render.minecraft.currentScreen.render(var94, var70);
                         }
 
                         Thread.yield();
@@ -1806,5 +1805,9 @@ public final class Minecraft implements Runnable {
       String name = System.getProperty("user.name");
       name = name == null ? "guest" : name;
       return name;
+   }
+
+   private static String generateSessionId() {
+       return "" + (new Random().nextInt(Integer.MAX_VALUE - 1));
    }
 }

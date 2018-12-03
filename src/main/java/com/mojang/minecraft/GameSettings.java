@@ -17,13 +17,9 @@ public final class GameSettings
 	public GameSettings(Minecraft minecraft, File minecraftFolder)
 	{
 		bindings = new KeyBinding[] {forwardKey, leftKey, backKey, rightKey, jumpKey, buildKey, chatKey, toggleFogKey, saveLocationKey, loadLocationKey};
-
-		settingCount = 8;
-
+		settingCount = 9;
 		this.minecraft = minecraft;
-
 		settingsFile = new File(minecraftFolder, "options.txt");
-
 		load();
 	}
 
@@ -36,6 +32,7 @@ public final class GameSettings
 	public boolean viewBobbing = true;
 	public boolean anaglyph = false;
 	public boolean limitFramerate = false;
+	public boolean creativeMode = true;
 	public KeyBinding forwardKey = new KeyBinding("Forward", 17);
 	public KeyBinding leftKey = new KeyBinding("Left", 30);
 	public KeyBinding backKey = new KeyBinding("Back", 31);
@@ -59,44 +56,24 @@ public final class GameSettings
 	public void setBinding(int key, int keyID)
 	{
 		bindings[key].key = keyID;
-
 		save();
 	}
 
 	public void toggleSetting(int setting, int fogValue)
 	{
-		if(setting == 0)
-		{
+		if(setting == 0) {
 			music = !music;
-		}
-
-		if(setting == 1)
-		{
+		} else if (setting == 1) {
 			sound = !sound;
-		}
-
-		if(setting == 2)
-		{
+		} else if (setting == 2) {
 			invertMouse = !invertMouse;
-		}
-
-		if(setting == 3)
-		{
+		} else if (setting == 3) {
 			showFrameRate = !showFrameRate;
-		}
-
-		if(setting == 4)
-		{
+		} else if (setting == 4) {
 			viewDistance = viewDistance + fogValue & 3;
-		}
-
-		if(setting == 5)
-		{
+		} else if (setting == 5) {
 			viewBobbing = !viewBobbing;
-		}
-
-		if(setting == 6)
-		{
+		} else if(setting == 6) {
 			anaglyph = !anaglyph;
 
 			TextureManager textureManager = minecraft.textureManager;
@@ -105,22 +82,18 @@ public final class GameSettings
 			int i;
 			BufferedImage image;
 
-			while(iterator.hasNext())
-			{
+			while(iterator.hasNext()) {
 				i = (Integer)iterator.next();
 				image = (BufferedImage)textureManager.textureImages.get(Integer.valueOf(i));
-
 				textureManager.load(image, i);
 			}
 
 			iterator = textureManager.textures.keySet().iterator();
 
-			while(iterator.hasNext())
-			{
+			while(iterator.hasNext()) {
 				String s = (String)iterator.next();
 
-				try
-				{
+				try {
 					if(s.startsWith("##"))
 					{
 						image = TextureManager.load1(ImageIO.read(TextureManager.class.getResourceAsStream(s.substring(2))));
@@ -135,18 +108,16 @@ public final class GameSettings
 					var6.printStackTrace();
 				}
 			}
-		}
-
-		if(setting == 7)
-		{
+		} else if(setting == 7) {
 			limitFramerate = !limitFramerate;
+		} else if (setting == 8) {
+			creativeMode = !creativeMode;
 		}
 
 		save();
 	}
 
-	public String getSetting(int id)
-	{
+	public String getSetting(int id) {
 		return id == 0 ? "Music: " + (music ? "ON" : "OFF")
 				: (id == 1 ? "Sound: " + (sound ? "ON" : "OFF")
 				: (id == 2 ? "Invert mouse: " + (invertMouse ? "ON" : "OFF")
@@ -155,68 +126,45 @@ public final class GameSettings
 				: (id == 5 ? "View bobbing: " + (viewBobbing ? "ON" : "OFF")
 				: (id == 6 ? "3d anaglyph: " + (anaglyph ? "ON" : "OFF")
 				: (id == 7 ? "Limit framerate: " + (limitFramerate ? "ON" : "OFF")
-				: "")))))));
+				: (id == 8 ? "Mode: " + (creativeMode ? "CREATIVE" : "SURVIVAL")
+				: ""))))))));
 	}
 
-	private void load()
-	{
-		try
-		{
-			if(settingsFile.exists())
-			{
+	private void load() {
+		try {
+			if(settingsFile.exists()) {
 				FileReader fileReader = new FileReader(settingsFile);
 				BufferedReader reader = new BufferedReader(fileReader);
 
 				String line = null;
 
-				while((line = reader.readLine()) != null)
-				{
+				while((line = reader.readLine()) != null) {
+
 					String[] setting = line.split(":");
 
-					if(setting[0].equals("music"))
-					{
+					if(setting[0].equals("music")) {
 						music = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("sound"))
-					{
+					} else if(setting[0].equals("sound")) {
 						sound = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("invertYMouse"))
-					{
+					} else if(setting[0].equals("invertYMouse")) {
 						invertMouse = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("showFrameRate"))
-					{
+					} else if(setting[0].equals("showFrameRate")) {
 						showFrameRate = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("viewDistance"))
-					{
+					} else if(setting[0].equals("viewDistance")) {
 						viewDistance = Integer.parseInt(setting[1]);
-					}
-
-					if(setting[0].equals("bobView"))
-					{
+					} else if(setting[0].equals("bobView")) {
 						viewBobbing = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("anaglyph3d"))
-					{
+					} if(setting[0].equals("anaglyph3d")) {
 						anaglyph = setting[1].equals("true");
-					}
-
-					if(setting[0].equals("limitFramerate"))
-					{
+					} else if(setting[0].equals("limitFramerate")) {
 						limitFramerate = setting[1].equals("true");
-					}
+					} else if (setting[0].equals("creativeMode")) {
+						creativeMode = Boolean.parseBoolean(setting[1]);
+				    }
 
-					for(int index = 0; index < this.bindings.length; index++)
-					{
-						if(setting[0].equals("key_" + bindings[index].name))
-						{
+
+					for(int index = 0; index < this.bindings.length; index++) {
+						if(setting[0].equals("key_" + bindings[index].name)) {
 							bindings[index].key = Integer.parseInt(setting[1]);
 						}
 					}
@@ -226,7 +174,6 @@ public final class GameSettings
 			}
 		} catch (Exception e) {
 			System.out.println("Failed to load options");
-
 			e.printStackTrace();
 		}
 	}
@@ -245,12 +192,12 @@ public final class GameSettings
 			writer.println("bobView:" + viewBobbing);
 			writer.println("anaglyph3d:" + anaglyph);
 			writer.println("limitFramerate:" + limitFramerate);
+			writer.println("creativeMode:" + creativeMode);
 
 			for(int binding = 0; binding < bindings.length; binding++)
 			{
 				writer.println("key_" + bindings[binding].name + ":" + bindings[binding].key);
 			}
-
 			writer.close();
 		} catch (Exception e) {
 			System.out.println("Failed to save options");
@@ -258,5 +205,4 @@ public final class GameSettings
 			e.printStackTrace();
 		}
 	}
-
 }

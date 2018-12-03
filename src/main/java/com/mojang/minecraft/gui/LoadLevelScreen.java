@@ -11,6 +11,10 @@ import javax.swing.SwingUtilities;
 
 public class LoadLevelScreen extends GuiScreen implements Runnable {
 
+   protected final static int NUM_ONLINE_LEVELS = 5;
+   protected final static int BTN_SAVE_LOAD = NUM_ONLINE_LEVELS;
+   protected final static int BTN_CANCEL = NUM_ONLINE_LEVELS + 1;
+
    protected GuiScreen parent;
    private boolean finished = false;
    private boolean loaded = false;
@@ -60,7 +64,7 @@ public class LoadLevelScreen extends GuiScreen implements Runnable {
    }
 
    protected void setLevels(String[] levels) {
-      for(int i = 0; i < 5; ++i) {
+      for(int i = 0; i < NUM_ONLINE_LEVELS; ++i) {
          ((Button)this.buttons.get(i)).active = !levels[i].equals("-");
          ((Button)this.buttons.get(i)).text = levels[i];
          ((Button)this.buttons.get(i)).visible = true;
@@ -71,31 +75,31 @@ public class LoadLevelScreen extends GuiScreen implements Runnable {
    public void onOpen() {
       (new Thread(this)).start();
 
-      for(int var1 = 0; var1 < 5; ++var1) {
-         this.buttons.add(new Button(var1, this.width / 2 - 100, this.height / 6 + var1 * 24, "---"));
-         ((Button)this.buttons.get(var1)).visible = false;
-         ((Button)this.buttons.get(var1)).active = false;
+      for(int i = 0; i < NUM_ONLINE_LEVELS; ++i) {
+         this.buttons.add(new Button(i, this.width / 2 - 100, this.height / 6 + i * 24, "---"));
+         ((Button)this.buttons.get(i)).visible = false;
+         ((Button)this.buttons.get(i)).active = false;
       }
 
-      this.buttons.add(new Button(5, this.width / 2 - 100, this.height / 6 + 120 + 12, "Load file..."));
-      this.buttons.add(new Button(6, this.width / 2 - 100, this.height / 6 + 168, "Cancel"));
+      this.buttons.add(new Button(BTN_SAVE_LOAD, this.width / 2 - 100, this.height / 6 + 120 + 12, "Load file..."));
+      this.buttons.add(new Button(BTN_CANCEL,    this.width / 2 - 100, this.height / 6 + 168, "Cancel"));
    }
 
    protected final void onButtonClick(Button button) {
       if(!this.frozen) {
          if(button.active) {
-            if(this.loaded && button.id < 5) {
+            if(this.loaded && button.id < NUM_ONLINE_LEVELS) {
                this.openLevel(button.id);
             }
 
-            if((this.finished || this.loaded) && button.id == 5) {
+            if((this.finished || this.loaded) && button.id == BTN_SAVE_LOAD) {
                this.frozen = true;
                LevelDialog dialog;
                (dialog = new LevelDialog(this)).setDaemon(true);
                SwingUtilities.invokeLater(dialog);
             }
 
-            if((this.finished || this.loaded) && button.id == 6) {
+            if((this.finished || this.loaded) && button.id == BTN_CANCEL) {
                this.minecraft.setCurrentScreen(this.parent);
             }
          }

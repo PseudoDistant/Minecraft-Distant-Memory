@@ -19,13 +19,6 @@ public class Inventory implements Serializable {
          this.slots[i] = -1;
          this.count[i] = 0;
       }
-this.slots[0] = 3; this.count[0] = 99;
-this.slots[1] = 37; this.count[1] = 99;
-this.slots[2] = 38; this.count[2] = 99;
-this.slots[3] = 39; this.count[3] = 99;
-this.slots[4] = 40; this.count[4] = 99;
-
-
    }
 
    public int getSelected() {

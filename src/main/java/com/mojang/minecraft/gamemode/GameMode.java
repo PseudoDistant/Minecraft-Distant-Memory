@@ -11,7 +11,6 @@ public class GameMode
 	public GameMode(Minecraft minecraft)
 	{
 		this.minecraft = minecraft;
-
 		instantBreak = false;
 	}
 

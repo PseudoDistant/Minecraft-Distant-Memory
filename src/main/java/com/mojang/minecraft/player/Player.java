@@ -52,8 +52,8 @@ public class Player extends Mob {
          this.level.player = this;
       }
 
-//      this.health = 20;
-      this.health = 0x0FFFFFFF;
+      this.health = 20;
+//      this.health = 0x0FFFFFFF;
       this.deathTime = 0;
    }
 

@@ -1,12 +1,12 @@
 package com.mojang.minecraft.gui;
 
 import com.mojang.minecraft.GameSettings;
-import com.mojang.minecraft.gui.Button;
-import com.mojang.minecraft.gui.ControlsScreen;
-import com.mojang.minecraft.gui.GuiScreen;
-import com.mojang.minecraft.gui.OptionButton;
 
 public final class OptionsScreen extends GuiScreen {
+
+   private static final int MAX_NUM_SETTINGS = 100;
+   private static final int BTN_CONTROLS = 100;
+   private static final int BTN_DONE = 200;
 
    private GuiScreen parent;
    private String title = "Options";
@@ -19,26 +19,26 @@ public final class OptionsScreen extends GuiScreen {
    }
 
    public final void onOpen() {
-      for(int var1 = 0; var1 < this.settings.settingCount; ++var1) {
-         this.buttons.add(new OptionButton(var1, this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), this.settings.getSetting(var1)));
+      for(int i = 0; i < this.settings.settingCount; ++i) {
+         this.buttons.add(new OptionButton(i, this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), this.settings.getSetting(i)));
       }
 
-      this.buttons.add(new Button(100, this.width / 2 - 100, this.height / 6 + 120 + 12, "Controls..."));
-      this.buttons.add(new Button(200, this.width / 2 - 100, this.height / 6 + 168, "Done"));
+      this.buttons.add(new Button(BTN_CONTROLS, this.width / 2 - 100, this.height / 6 + 120 + 12, "Controls..."));
+      this.buttons.add(new Button(BTN_DONE, this.width / 2 - 100, this.height / 6 + 168, "Done"));
    }
 
-   protected final void onButtonClick(Button var1) {
-      if(var1.active) {
-         if(var1.id < 100) {
-            this.settings.toggleSetting(var1.id, 1);
-            var1.text = this.settings.getSetting(var1.id);
+   protected final void onButtonClick(Button button) {
+      if(button.active) {
+         if(button.id < MAX_NUM_SETTINGS) {
+            this.settings.toggleSetting(button.id, 1);
+            button.text = this.settings.getSetting(button.id);
          }
 
-         if(var1.id == 100) {
+         if(button.id == BTN_CONTROLS) {
             this.minecraft.setCurrentScreen(new ControlsScreen(this, this.settings));
          }
 
-         if(var1.id == 200) {
+         if(button.id == BTN_DONE) {
             this.minecraft.setCurrentScreen(this.parent);
          }
 
