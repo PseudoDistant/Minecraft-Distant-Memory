@@ -13,9 +13,9 @@ public final class SessionData {
    public boolean haspaid;
 
 
-   public SessionData(String var1, String var2) {
-      this.username = var1;
-      this.sessionId = var2;
+   public SessionData(String user, String sessId) {
+      this.username = user;
+      this.sessionId = sessId;
    }
 
    static {

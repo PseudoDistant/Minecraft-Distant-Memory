@@ -53,11 +53,12 @@ import java.io.*;
 import java.nio.IntBuffer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public final class Minecraft implements Runnable {
 
-//   public GameMode gamemode = new SurvivalGameMode(this);
-   public GameMode gamemode = new CreativeGameMode(this);
+   public GameMode gamemode = new SurvivalGameMode(this);
+//   public GameMode gamemode = new CreativeGameMode(this);
    private boolean fullscreen = false;
    public int width;
    public int height;
@@ -102,6 +103,8 @@ public final class Minecraft implements Runnable {
 
 
    public Minecraft(Canvas canvas, MinecraftApplet applet, int width, int height, boolean fullscreen) {
+      this.gamemode = new CreativeGameMode(this);
+      this.session = new SessionData(getUserName(), "" + (new Random().nextInt(Integer.MAX_VALUE - 1)));
       this.levelIo = new LevelIO(this.progressBar);
       this.sound = new SoundManager();
       this.ticks = 0;
@@ -139,7 +142,6 @@ public final class Minecraft implements Runnable {
             var8.printStackTrace();
          }
       }
-      this.gamemode = new CreativeGameMode(this);
    }
 
    public final void setCurrentScreen(GuiScreen var1) {
@@ -1798,5 +1800,11 @@ public final class Minecraft implements Runnable {
       }
 
       System.gc();
+   }
+
+   private static String getUserName() {
+      String name = System.getProperty("user.name");
+      name = name == null ? "guest" : name;
+      return name;
    }
 }

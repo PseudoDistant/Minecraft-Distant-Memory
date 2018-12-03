@@ -13,11 +13,14 @@ public final class LevelNameScreen extends GuiScreen {
    private String name;
    private int counter = 0;
 
+   private static final int BTN_SAVE   = 0;
+   private static final int BTN_CANCEL = 1;
 
-   public LevelNameScreen(GuiScreen var1, String var2, int var3) {
-      this.parent = var1;
-      this.id = var3;
-      this.name = var2;
+
+   public LevelNameScreen(GuiScreen screen, String name, int id) {
+      this.parent = screen;
+      this.id = id;
+      this.name = name;
       if(this.name.equals("-")) {
          this.name = "";
       }
@@ -27,9 +30,9 @@ public final class LevelNameScreen extends GuiScreen {
    public final void onOpen() {
       this.buttons.clear();
       Keyboard.enableRepeatEvents(true);
-      this.buttons.add(new Button(0, this.width / 2 - 100, this.height / 4 + 120, "Save"));
-      this.buttons.add(new Button(1, this.width / 2 - 100, this.height / 4 + 144, "Cancel"));
-      ((Button)this.buttons.get(0)).active = this.name.trim().length() > 1;
+      this.buttons.add(new Button(BTN_SAVE,   this.width / 2 - 100, this.height / 4 + 120, "Save"));
+      this.buttons.add(new Button(BTN_CANCEL, this.width / 2 - 100, this.height / 4 + 144, "Cancel"));
+      ((Button)this.buttons.get(BTN_SAVE)).active = this.name.trim().length() > 1;
    }
 
    public final void onClose() {
@@ -40,9 +43,9 @@ public final class LevelNameScreen extends GuiScreen {
       ++this.counter;
    }
 
-   protected final void onButtonClick(Button var1) {
-      if(var1.active) {
-         if(var1.id == 0 && this.name.trim().length() > 1) {
+   protected final void onButtonClick(Button button) {
+      if(button.active) {
+         if(button.id == BTN_SAVE && this.name.trim().length() > 1) {
             Minecraft var10000 = this.minecraft;
             int var10001 = this.id;
             String var2 = this.name.trim();
@@ -53,23 +56,23 @@ public final class LevelNameScreen extends GuiScreen {
             this.minecraft.grabMouse();
          }
 
-         if(var1.id == 1) {
+         if(button.id == BTN_CANCEL) {
             this.minecraft.setCurrentScreen(this.parent);
          }
 
       }
    }
 
-   protected final void onKeyPress(char var1, int var2) {
-      if(var2 == 14 && this.name.length() > 0) {
+   protected final void onKeyPress(char charTyped, int keyCodeTyped) {
+      if(keyCodeTyped == 14 && this.name.length() > 0) {
          this.name = this.name.substring(0, this.name.length() - 1);
       }
 
-      if("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\"#%/()=+?[]{}<>".indexOf(var1) >= 0 && this.name.length() < 64) {
-         this.name = this.name + var1;
+      if("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.:-_\'*!\"#%/()=+?[]{}<>".indexOf(charTyped) >= 0 && this.name.length() < 64) {
+         this.name = this.name + charTyped;
       }
 
-      ((Button)this.buttons.get(0)).active = this.name.trim().length() > 1;
+      ((Button)this.buttons.get(BTN_SAVE)).active = this.name.trim().length() > 1;
    }
 
    public final void render(int var1, int var2) {

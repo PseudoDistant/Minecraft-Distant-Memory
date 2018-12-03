@@ -1,8 +1,6 @@
 package com.mojang.minecraft.level;
 
 import com.mojang.minecraft.ProgressBarDisplay;
-import com.mojang.minecraft.level.Level;
-import com.mojang.minecraft.level.LevelObjectInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -28,21 +26,21 @@ public final class LevelIO {
       this.progressBar = var1;
    }
 
-   public final boolean save(Level var1, File var2) {
+   public final boolean save(Level level, File saveFile) {
       try {
-         FileOutputStream var5 = new FileOutputStream(var2);
-         save(var1, (OutputStream)var5);
-         var5.close();
+         FileOutputStream out = new FileOutputStream(saveFile);
+         save(level, (OutputStream)out);
+         out.close();
          return true;
-      } catch (Exception var4) {
-         var4.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
          if(this.progressBar != null) {
             this.progressBar.setText("Failed!");
          }
 
          try {
             Thread.sleep(1000L);
-         } catch (InterruptedException var3) {
+         } catch (InterruptedException interrupted) {
             ;
          }
 

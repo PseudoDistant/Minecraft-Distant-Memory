@@ -1,52 +1,71 @@
 package com.mojang.minecraft.gui;
 
-import com.mojang.minecraft.gui.LoadLevelScreen;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
 
 final class LevelDialog extends Thread {
 
    // $FF: synthetic field
    private LoadLevelScreen screen;
+   private static File suggestedFile  = getSuggestedFile();
 
 
-   LevelDialog(LoadLevelScreen var1) {
+   LevelDialog(LoadLevelScreen levelScreen) {
 	   super();
-      this.screen = var1;
+      this.screen = levelScreen;
    }
 
    public final void run() {
-      JFileChooser var1;
-      LoadLevelScreen var2;
+      JFileChooser fileChooser = null;
+      LoadLevelScreen scrn = null;
       try {
-         LoadLevelScreen var10000 = this.screen;
-         var1 = new JFileChooser();
-         var10000.chooser = var1;
-         FileNameExtensionFilter var3 = new FileNameExtensionFilter("Minecraft levels", new String[]{"mine"});
-         var2 = this.screen;
-         this.screen.chooser.setFileFilter(var3);
-         var2 = this.screen;
+         LoadLevelScreen levelScreen = this.screen;
+         fileChooser = new JFileChooser();
+         levelScreen.chooser = fileChooser;
+         FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("Minecraft levels", new String[]{"mine"});
+         scrn = this.screen;
+         this.screen.chooser.setFileFilter(fileFilter);
          this.screen.chooser.setMultiSelectionEnabled(false);
-         int var7;
+         int buttonPressed;
          if(this.screen.saving) {
-            var2 = this.screen;
-            var7 = this.screen.chooser.showSaveDialog(this.screen.minecraft.canvas);
+             if (suggestedFile.getParentFile().exists()) {this.screen.chooser.setSelectedFile(suggestedFile);}
+             buttonPressed = this.screen.chooser.showSaveDialog(this.screen.minecraft.canvas);
          } else {
-            var2 = this.screen;
-            var7 = this.screen.chooser.showOpenDialog(this.screen.minecraft.canvas);
+             if (suggestedFile.exists()) { this.screen.chooser.setSelectedFile(suggestedFile);}
+             buttonPressed = this.screen.chooser.showOpenDialog(this.screen.minecraft.canvas);
          }
-
-         if(var7 == 0) {
-            (var2 = this.screen).selectedFile = this.screen.chooser.getSelectedFile();
+         if(buttonPressed == 0) {
+            this.screen.selectedFile = this.screen.chooser.getSelectedFile();
+             suggestedFile = this.screen.selectedFile;
          }
       } finally {
-         boolean var6 = false;
-         var2 = this.screen;
          this.screen.frozen = false;
-         var1 = null;
-         var2 = this.screen;
-         this.screen.chooser = var1;
+         fileChooser = null;
+         this.screen.chooser = fileChooser;
       }
 
+   }
+
+   private static String getUserName() {
+       String name = System.getProperty("user.name");
+       name = name == null ? "guest" : name;
+       return name;
+   }
+
+   private static File getSuggestedFile() {
+       if (suggestedFile != null) {
+           return suggestedFile;
+       }
+       String userHome = System.getProperty("user.home");
+       String userDir  = System.getProperty("user.dir");
+       String userName = getUserName();
+       File homeDir = userHome == null ? null : new File(userHome);
+       File dir = (userDir == null) ? null : new File(userDir);
+       dir = homeDir == null || !homeDir.exists()? dir : homeDir;
+       dir = dir != null && dir.exists() ? dir : FileSystemView.getFileSystemView().getRoots()[0];
+       File file = new File(dir, userName);
+       return file;
    }
 }
