@@ -1,3 +1,5 @@
+
+![Minecraft Classic FOrever](doc/images/minecraft-logo.png "Minecraft Classic Forever")
 Minecraft Classic Forever
 =========================
 The Minecraft Classic Forever project brings you the source to Minecraft 0.30 (Classic) along with the latest version of J-OGG!
