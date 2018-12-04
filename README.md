@@ -72,6 +72,19 @@ Then in the console, execute the command:
 ./gradlew run
 ```
 
+Screenshots
+-----------
+
+*Panoramic View in Creative Mode*
+![Panoramic View In Creative Mode](doc/images/screenshot-creative-panoram.png "Panoramic View In Creative Mode")
+
+
+*Controls Screen*
+![Controls Screen](doc/images/screenshot-constrols.png "Controls Screen")
+
+
+*Options Screen*
+![Options Screen](doc/images/screenshot-options.png "Options Screen")
 
 License
 -------
