@@ -80,11 +80,15 @@ Screenshots
 
 
 *Controls Screen*
-![Controls Screen](doc/images/screenshot-constrols.png "Controls Screen")
+![Controls Screen](doc/images/screenshot-controls.png "Controls Screen")
 
 
 *Options Screen*
 ![Options Screen](doc/images/screenshot-options.png "Options Screen")
+
+
+*Panoramic View in Survival Mode*
+![Panoramic View In Survival Mode](doc/images/screenshot-survival-panoramic.png "Panoramic View In Survival Mode")
 
 License
 -------
