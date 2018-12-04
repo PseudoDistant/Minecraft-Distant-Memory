@@ -136,24 +136,24 @@ public final class Minecraft implements Runnable {
          try {
             this.robot = new Robot();
             return;
-         } catch (AWTException var8) {
-            var8.printStackTrace();
+         } catch (AWTException awtException) {
+            awtException.printStackTrace();
          }
       }
    }
 
-   public final void setCurrentScreen(GuiScreen var1) {
+   public final void setCurrentScreen(GuiScreen screen) {
       if(!(this.currentScreen instanceof ErrorScreen)) {
          if(this.currentScreen != null) {
             this.currentScreen.onClose();
          }
 
-         if(var1 == null && this.player.health <= 0) {
-            var1 = new GameOverScreen();
+         if(screen == null && this.player.health <= 0) {
+            screen = new GameOverScreen();
          }
 
-         this.currentScreen = (GuiScreen)var1;
-         if(var1 != null) {
+         this.currentScreen = (GuiScreen)screen;
+         if(screen != null) {
             if(this.hasMouse) {
                this.player.releaseAllKeys();
                this.hasMouse = false;
@@ -170,7 +170,7 @@ public final class Minecraft implements Runnable {
 
             int var2 = this.width * 240 / this.height;
             int var3 = this.height * 240 / this.height;
-            ((GuiScreen)var1).open(this, var2, var3);
+            ((GuiScreen)screen).open(this, var2, var3);
             this.online = false;
          } else {
             this.grabMouse();
@@ -178,13 +178,13 @@ public final class Minecraft implements Runnable {
       }
    }
 
-   private static void checkGLError(String var0) {
-      int var1;
-      if((var1 = GL11.glGetError()) != 0) {
-         String var2 = GLU.gluErrorString(var1);
+   private static void checkGLError(String when) {
+      int errorCode;
+      if((errorCode = GL11.glGetError()) != 0) {
+         String errorMessage = GLU.gluErrorString(errorCode);
          System.out.println("########## GL ERROR ##########");
-         System.out.println("@ " + var0);
-         System.out.println(var1 + ": " + var2);
+         System.out.println("@ " + when);
+         System.out.println(errorCode + ": " + errorMessage);
          System.exit(0);
       }
 
@@ -193,24 +193,24 @@ public final class Minecraft implements Runnable {
    public final void shutdown() {
       try {
          if(this.soundPlayer != null) {
-            SoundPlayer var1 = this.soundPlayer;
+            SoundPlayer player = this.soundPlayer;
             this.soundPlayer.running = false;
          }
 
          if(this.resourceThread != null) {
-            ResourceDownloadThread var4 = this.resourceThread;
+            ResourceDownloadThread resourceThread = this.resourceThread;
             this.resourceThread.running = true;
          }
-      } catch (Exception var3) {
+      } catch (Exception exception) {
          ;
       }
 
-      Minecraft var5 = this;
+      Minecraft mc = this;
       if(!this.levelLoaded) {
          try {
-            LevelIO.save(var5.level, (OutputStream)(new FileOutputStream(new File("level.dat"))));
-         } catch (Exception var2) {
-            var2.printStackTrace();
+            LevelIO.save(mc.level, (OutputStream)(new FileOutputStream(new File("level.dat"))));
+         } catch (Exception saveException) {
+            saveException.printStackTrace();
          }
       }
 
@@ -1100,10 +1100,10 @@ public final class Minecraft implements Runnable {
          }
 
          return;
-      } catch (StopGameException var59) {
+      } catch (StopGameException stopGameException) {
          ;
-      } catch (Exception var60) {
-         var60.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
          return;
       } finally {
          this.shutdown();

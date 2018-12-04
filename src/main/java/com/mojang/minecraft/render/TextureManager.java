@@ -46,7 +46,7 @@ public class TextureManager {
 
             this.textures.put(var1, Integer.valueOf(var4));
             return var4;
-         } catch (IOException var3) {
+         } catch (IOException ioException) {
             throw new RuntimeException("!!");
          }
       }

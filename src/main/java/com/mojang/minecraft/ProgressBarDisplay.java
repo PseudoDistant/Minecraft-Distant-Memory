@@ -18,39 +18,39 @@ public final class ProgressBarDisplay {
       this.minecraft = var1;
    }
 
-   public final void setTitle(String var1) {
+   public final void setTitle(String title) {
       if(!this.minecraft.running) {
          throw new StopGameException();
       } else {
-         this.title = var1;
-         int var3 = this.minecraft.width * 240 / this.minecraft.height;
-         int var2 = this.minecraft.height * 240 / this.minecraft.height;
+         this.title = title;
+         int right = this.minecraft.width * 240 / this.minecraft.height;
+         int bottom = this.minecraft.height * 240 / this.minecraft.height;
          GL11.glClear(256);
          GL11.glMatrixMode(5889);
          GL11.glLoadIdentity();
-         GL11.glOrtho(0.0D, (double)var3, (double)var2, 0.0D, 100.0D, 300.0D);
+         GL11.glOrtho(0.0D, (double)right, (double)bottom, 0.0D, 100.0D, 300.0D);
          GL11.glMatrixMode(5888);
          GL11.glLoadIdentity();
          GL11.glTranslatef(0.0F, 0.0F, -200.0F);
       }
    }
 
-   public final void setText(String var1) {
+   public final void setText(String text) {
       if(!this.minecraft.running) {
          throw new StopGameException();
       } else {
-         this.text = var1;
+         this.text = text;
          this.setProgress(-1);
       }
    }
 
-   public final void setProgress(int var1) {
+   public final void setProgress(int progressValue) {
       if(!this.minecraft.running) {
          throw new StopGameException();
       } else {
-         long var2;
-         if((var2 = System.currentTimeMillis()) - this.start < 0L || var2 - this.start >= 20L) {
-            this.start = var2;
+         long currentTimeMillis;
+         if((currentTimeMillis = System.currentTimeMillis()) - this.start < 0L || currentTimeMillis - this.start >= 20L) {
+            this.start = currentTimeMillis;
             int var4 = this.minecraft.width * 240 / this.minecraft.height;
             int var5 = this.minecraft.height * 240 / this.minecraft.height;
             GL11.glClear(16640);
@@ -65,7 +65,7 @@ public final class ProgressBarDisplay {
             var6.vertexUV((float)var4, 0.0F, 0.0F, (float)var4 / var10, 0.0F);
             var6.vertexUV(0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
             var6.end();
-            if(var1 >= 0) {
+            if(progressValue >= 0) {
                var7 = var4 / 2 - 50;
                int var8 = var5 / 2 + 16;
                GL11.glDisable(3553);
@@ -78,8 +78,8 @@ public final class ProgressBarDisplay {
                var6.color(8454016);
                var6.vertex((float)var7, (float)var8, 0.0F);
                var6.vertex((float)var7, (float)(var8 + 2), 0.0F);
-               var6.vertex((float)(var7 + var1), (float)(var8 + 2), 0.0F);
-               var6.vertex((float)(var7 + var1), (float)var8, 0.0F);
+               var6.vertex((float)(var7 + progressValue), (float)(var8 + 2), 0.0F);
+               var6.vertex((float)(var7 + progressValue), (float)var8, 0.0F);
                var6.end();
                GL11.glEnable(3553);
             }
@@ -90,7 +90,7 @@ public final class ProgressBarDisplay {
 
             try {
                Thread.yield();
-            } catch (Exception var9) {
+            } catch (Exception exception) {
                ;
             }
          }

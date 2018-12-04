@@ -46,12 +46,11 @@ public final class LevelNameScreen extends GuiScreen {
    protected final void onButtonClick(Button button) {
       if(button.active) {
          if(button.id == BTN_SAVE && this.name.trim().length() > 1) {
-            Minecraft var10000 = this.minecraft;
-            int var10001 = this.id;
-            String var2 = this.name.trim();
-            int var3 = var10001;
-            Minecraft var4 = var10000;
-            var10000.levelIo.saveOnline(var4.level, var4.host, var4.session.username, var4.session.sessionId, var2, var3);
+            Minecraft mc = this.minecraft;
+            int id = this.id;
+            String levelName = this.name.trim();
+            int levelId = id;
+            mc.levelIo.saveOnline(mc.level, mc.host, mc.session.username, mc.session.sessionId, levelName, levelId);
             this.minecraft.setCurrentScreen((GuiScreen)null);
             this.minecraft.grabMouse();
          }

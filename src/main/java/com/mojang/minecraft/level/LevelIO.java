@@ -48,21 +48,21 @@ public final class LevelIO {
       }
    }
 
-   public final Level load(File var1) {
+   public final Level load(File saveFile) {
       try {
-         FileInputStream var5 = new FileInputStream(var1);
-         Level var2 = this.load((InputStream)var5);
-         var5.close();
+         FileInputStream in = new FileInputStream(saveFile);
+         Level var2 = this.load((InputStream)in);
+         in.close();
          return var2;
-      } catch (Exception var4) {
-         var4.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
          if(this.progressBar != null) {
             this.progressBar.setText("Failed!");
          }
 
          try {
             Thread.sleep(1000L);
-         } catch (InterruptedException var3) {
+         } catch (InterruptedException interrupted) {
             ;
          }
 
@@ -70,9 +70,9 @@ public final class LevelIO {
       }
    }
 
-   public final boolean saveOnline(Level var1, String var2, String var3, String var4, String var5, int var6) {
-      if(var4 == null) {
-         var4 = "";
+   public final boolean saveOnline(Level level, String host, String username, String sessionId, String levelName, int levelId) {
+      if(sessionId == null) {
+         sessionId = "";
       }
 
       if(this.progressBar != null && this.progressBar != null) {
@@ -84,52 +84,52 @@ public final class LevelIO {
             this.progressBar.setText("Compressing..");
          }
 
-         ByteArrayOutputStream var7 = new ByteArrayOutputStream();
-         save(var1, (OutputStream)var7);
-         var7.close();
-         byte[] var10 = var7.toByteArray();
+         ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+         save(level, (OutputStream)byteArrayOut);
+         byteArrayOut.close();
+         byte[] byteArray = byteArrayOut.toByteArray();
          if(this.progressBar != null && this.progressBar != null) {
             this.progressBar.setText("Connecting..");
          }
 
-         HttpURLConnection var12;
-         (var12 = (HttpURLConnection)(new URL("http://" + var2 + "/level/save.html")).openConnection()).setDoInput(true);
-         var12.setDoOutput(true);
-         var12.setRequestMethod("POST");
-         DataOutputStream var13;
-         (var13 = new DataOutputStream(var12.getOutputStream())).writeUTF(var3);
-         var13.writeUTF(var4);
-         var13.writeUTF(var5);
-         var13.writeByte(var6);
-         var13.writeInt(var10.length);
+         HttpURLConnection urlConnection;
+         (urlConnection = (HttpURLConnection)(new URL("http://" + host + "/level/save.html")).openConnection()).setDoInput(true);
+         urlConnection.setDoOutput(true);
+         urlConnection.setRequestMethod("POST");
+         DataOutputStream out;
+         (out = new DataOutputStream(urlConnection.getOutputStream())).writeUTF(username);
+         out.writeUTF(sessionId);
+         out.writeUTF(levelName);
+         out.writeByte(levelId);
+         out.writeInt(byteArray.length);
          if(this.progressBar != null) {
             this.progressBar.setText("Saving..");
          }
 
-         var13.write(var10);
-         var13.close();
-         BufferedReader var11;
-         if(!(var11 = new BufferedReader(new InputStreamReader(var12.getInputStream()))).readLine().equalsIgnoreCase("ok")) {
+         out.write(byteArray);
+         out.close();
+         BufferedReader in;
+         if(!(in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()))).readLine().equalsIgnoreCase("ok")) {
             if(this.progressBar != null) {
-               this.progressBar.setText("Failed: " + var11.readLine());
+               this.progressBar.setText("Failed: " + in.readLine());
             }
 
-            var11.close();
+            in.close();
             Thread.sleep(1000L);
             return false;
          } else {
-            var11.close();
+            in.close();
             return true;
          }
-      } catch (Exception var9) {
-         var9.printStackTrace();
+      } catch (Exception exception) {
+         exception.printStackTrace();
          if(this.progressBar != null) {
             this.progressBar.setText("Failed!");
          }
 
          try {
             Thread.sleep(1000L);
-         } catch (InterruptedException var8) {
+         } catch (InterruptedException interrupted) {
             ;
          }
 
@@ -147,14 +147,14 @@ public final class LevelIO {
             this.progressBar.setText("Connecting..");
          }
 
-         HttpURLConnection var6;
-         (var6 = (HttpURLConnection)(new URL("http://" + server + "/level/load.html?id=" + id + "&user=" + user)).openConnection()).setDoInput(true);
+         HttpURLConnection urlConnection;
+         (urlConnection = (HttpURLConnection)(new URL("http://" + server + "/level/load.html?id=" + id + "&user=" + user)).openConnection()).setDoInput(true);
          if(this.progressBar != null) {
             this.progressBar.setText("Loading..");
          }
 
          DataInputStream in;
-         if((in = new DataInputStream(var6.getInputStream())).readUTF().equalsIgnoreCase("ok")) {
+         if((in = new DataInputStream(urlConnection.getInputStream())).readUTF().equalsIgnoreCase("ok")) {
             return this.load((InputStream)in);
          } else {
             if(this.progressBar != null) {
@@ -181,7 +181,7 @@ public final class LevelIO {
       }
    }
 
-   public final Level load(InputStream var1) {
+   public final Level load(InputStream levelInputStream) {
       if(this.progressBar != null) {
          this.progressBar.setTitle("Loading level");
       }
@@ -191,66 +191,66 @@ public final class LevelIO {
       }
 
       try {
-         DataInputStream var10;
-         if((var10 = new DataInputStream(new GZIPInputStream(var1))).readInt() != 656127880) {
+         DataInputStream dataInputStream;
+         if((dataInputStream = new DataInputStream(new GZIPInputStream(levelInputStream))).readInt() != 656127880) {
             return null;
          } else {
-            byte var12;
-            if((var12 = var10.readByte()) > 2) {
+            byte version;
+            if((version = dataInputStream.readByte()) > 2) {
                return null;
-            } else if(var12 <= 1) {
-               String var14 = var10.readUTF();
-               String var15 = var10.readUTF();
-               long var3 = var10.readLong();
-               short var5 = var10.readShort();
-               short var6 = var10.readShort();
-               short var7 = var10.readShort();
-               byte[] var8 = new byte[var5 * var6 * var7];
-               var10.readFully(var8);
-               var10.close();
-               Level var11;
-               (var11 = new Level()).setData(var5, var7, var6, var8);
-               var11.name = var14;
-               var11.creator = var15;
-               var11.createTime = var3;
-               return var11;
+            } else if(version <= 1) {
+               String levelName = dataInputStream.readUTF();
+               String levelCreator = dataInputStream.readUTF();
+               long levelCreationTime = dataInputStream.readLong();
+               short width = dataInputStream.readShort();
+               short height = dataInputStream.readShort();
+               short depth = dataInputStream.readShort();
+               byte[] blocks = new byte[width * height * depth];
+               dataInputStream.readFully(blocks);
+               dataInputStream.close();
+               Level gameLevel;
+               (gameLevel = new Level()).setData(width, depth, height, blocks);
+               gameLevel.name = levelName;
+               gameLevel.creator = levelCreator;
+               gameLevel.createTime = levelCreationTime;
+               return gameLevel;
             } else {
-               Level var2;
-               LevelObjectInputStream var13;
-               (var2 = (Level)(var13 = new LevelObjectInputStream(var10)).readObject()).initTransient();
-               var13.close();
-               return var2;
+               Level level;
+               LevelObjectInputStream in;
+               (level = (Level)(in = new LevelObjectInputStream(dataInputStream)).readObject()).initTransient();
+               in.close();
+               return level;
             }
          }
-      } catch (Exception var9) {
-         var9.printStackTrace();
-         System.out.println("Failed to load level: " + var9.toString());
+      } catch (Exception exception) {
+         exception.printStackTrace();
+         System.out.println("Failed to load level: " + exception.toString());
          return null;
       }
    }
 
-   public static void save(Level var0, OutputStream var1) {
+   public static void save(Level level, OutputStream outputStream) {
       try {
-         DataOutputStream var3;
-         (var3 = new DataOutputStream(new GZIPOutputStream(var1))).writeInt(656127880);
-         var3.writeByte(2);
-         ObjectOutputStream var4;
-         (var4 = new ObjectOutputStream(var3)).writeObject(var0);
-         var4.close();
-      } catch (Exception var2) {
-         var2.printStackTrace();
+         DataOutputStream dataOutputStream;
+         (dataOutputStream = new DataOutputStream(new GZIPOutputStream(outputStream))).writeInt(656127880);
+         dataOutputStream.writeByte(2);
+         ObjectOutputStream objectOutputStream;
+         (objectOutputStream = new ObjectOutputStream(dataOutputStream)).writeObject(level);
+         objectOutputStream.close();
+      } catch (Exception exception) {
+         exception.printStackTrace();
       }
    }
 
-   public static byte[] decompress(InputStream var0) {
+   public static byte[] decompress(InputStream inputStream) {
       try {
-         DataInputStream var3;
-         byte[] var1 = new byte[(var3 = new DataInputStream(new GZIPInputStream(var0))).readInt()];
-         var3.readFully(var1);
-         var3.close();
-         return var1;
-      } catch (Exception var2) {
-         throw new RuntimeException(var2);
+         DataInputStream dataInputStream;
+         byte[] byteArrayData = new byte[(dataInputStream = new DataInputStream(new GZIPInputStream(inputStream))).readInt()];
+         dataInputStream.readFully(byteArrayData);
+         dataInputStream.close();
+         return byteArrayData;
+      } catch (Exception exception) {
+         throw new RuntimeException(exception);
       }
    }
 }
