@@ -12,11 +12,12 @@ Although the original repo provides the source code of Minecraft Classic, it doe
 So one cannot easily run it into a playable game. 
 
 
-Thie forked repo aims to fill this gap and provides a build script using [gradle](https://gradle.org/) as build tool.
+Thie forked repo aims to fill this gap and provides a build script using [gradle](https://gradle.org/) and [Java Developmet Kit (JDK)](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html) as build tool.
 Read on for instructions on how to obtain/download the sources, compile them, run the game and finally play.
 
 
-Note: You do not need to install gradle.
+Note: You do not need to install gradle. 
+      However, you need to istall [Java JDK](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html). Havig just the Java Rutime Environment (JRE) would not be sufficient.
 
 How to play
 ===========
