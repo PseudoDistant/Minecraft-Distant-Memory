@@ -27,20 +27,20 @@ public class NetworkPlayer extends HumanoidMob {
    private TextureManager textures;
 
 
-   public NetworkPlayer(Minecraft var1, int var2, String var3, int var4, int var5, int var6, float var7, float var8) {
-      super(var1.level, (float)var4, (float)var5, (float)var6);
-      this.minecraft = var1;
-      this.displayName = var3;
-      var3 = FontRenderer.stripColor(var3);
-      this.name = var3;
-      this.xp = var4;
-      this.yp = var5;
-      this.zp = var6;
+   public NetworkPlayer(Minecraft mc, int var2, String name, int xp, int yp, int zp, float yRot, float xRot) {
+      super(mc.level, (float)xp, (float)yp, (float)zp);
+      this.minecraft = mc;
+      this.displayName = name;
+      name = FontRenderer.stripColor(name);
+      this.name = name;
+      this.xp = xp;
+      this.yp = yp;
+      this.zp = zp;
       this.heightOffset = 0.0F;
       this.pushthrough = 0.8F;
-      this.setPos((float)var4 / 32.0F, (float)var5 / 32.0F, (float)var6 / 32.0F);
-      this.xRot = var8;
-      this.yRot = var7;
+      this.setPos((float)xp / 32.0F, (float)yp / 32.0F, (float)zp / 32.0F);
+      this.xRot = xRot;
+      this.yRot = yRot;
       this.armor = this.helmet = false;
       this.renderOffset = 0.6875F;
       (new SkinDownloadThread(this)).start();
@@ -48,67 +48,67 @@ public class NetworkPlayer extends HumanoidMob {
    }
 
    public void aiStep() {
-      int var1 = 5;
+      int iterations = 5;
 
       do {
          if(this.moveQueue.size() > 0) {
             this.setPos((PositionUpdate)this.moveQueue.remove(0));
          }
-      } while(var1-- > 0 && this.moveQueue.size() > 10);
+      } while(iterations-- > 0 && this.moveQueue.size() > 10);
 
       this.onGround = true;
    }
 
-   public void bindTexture(TextureManager var1) {
-      this.textures = var1;
+   public void bindTexture(TextureManager textureManager) {
+      this.textures = textureManager;
       if(this.newTexture != null) {
-         BufferedImage var2 = this.newTexture;
-         int[] var3 = new int[512];
-         var2.getRGB(32, 0, 32, 16, var3, 0, 32);
-         int var5 = 0;
+         BufferedImage image = this.newTexture;
+         int[] buff512 = new int[512];
+         image.getRGB(32, 0, 32, 16, buff512, 0, 32);
+         int iterations = 0;
 
-         boolean var10001;
+         boolean hairAvailable;
          while(true) {
-            if(var5 >= var3.length) {
-               var10001 = false;
+            if(iterations >= buff512.length) {
+               hairAvailable = false;
                break;
             }
 
-            if(var3[var5] >>> 24 < 128) {
-               var10001 = true;
+            if(buff512[iterations] >>> 24 < 128) {
+               hairAvailable = true;
                break;
             }
 
-            ++var5;
+            ++iterations;
          }
 
-         this.hasHair = var10001;
-         this.a = var1.load(this.newTexture);
+         this.hasHair = hairAvailable;
+         this.a = textureManager.load(this.newTexture);
          this.newTexture = null;
       }
 
       if(this.a < 0) {
-         GL11.glBindTexture(3553, var1.load("/char.png"));
+         GL11.glBindTexture(3553, textureManager.load("/char.png"));
       } else {
          GL11.glBindTexture(3553, this.a);
       }
    }
 
-   public void renderHover(TextureManager var1, float var2) {
-      FontRenderer var3 = this.minecraft.fontRenderer;
+   public void renderHover(TextureManager textureManager, float var2) {
+      FontRenderer reader = this.minecraft.fontRenderer;
       GL11.glPushMatrix();
       GL11.glTranslatef(this.xo + (this.x - this.xo) * var2, this.yo + (this.y - this.yo) * var2 + 0.8F + this.renderOffset, this.zo + (this.z - this.zo) * var2);
       GL11.glRotatef(-this.minecraft.player.yRot, 0.0F, 1.0F, 0.0F);
       var2 = 0.05F;
       GL11.glScalef(0.05F, -var2, var2);
-      GL11.glTranslatef((float)(-var3.getWidth(this.displayName)) / 2.0F, 0.0F, 0.0F);
+      GL11.glTranslatef((float)(-reader.getWidth(this.displayName)) / 2.0F, 0.0F, 0.0F);
       GL11.glNormal3f(1.0F, -1.0F, 1.0F);
       GL11.glDisable(2896);
       GL11.glDisable(16384);
       if(this.name.equalsIgnoreCase("Notch")) {
-         var3.renderNoShadow(this.displayName, 0, 0, 16776960);
+         reader.renderNoShadow(this.displayName, 0, 0, 16776960);
       } else {
-         var3.renderNoShadow(this.displayName, 0, 0, 16777215);
+         reader.renderNoShadow(this.displayName, 0, 0, 16777215);
       }
 
       GL11.glDepthFunc(516);
@@ -116,18 +116,18 @@ public class NetworkPlayer extends HumanoidMob {
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.8F);
       GL11.glEnable(3042);
       GL11.glBlendFunc(770, 771);
-      var3.renderNoShadow(this.displayName, 0, 0, 16777215);
+      reader.renderNoShadow(this.displayName, 0, 0, 16777215);
       GL11.glDisable(3042);
       GL11.glDepthMask(true);
       GL11.glDepthFunc(515);
       GL11.glTranslatef(1.0F, 1.0F, -0.05F);
-      var3.renderNoShadow(this.name, 0, 0, 5263440);
+      reader.renderNoShadow(this.name, 0, 0, 5263440);
       GL11.glEnable(16384);
       GL11.glEnable(2896);
       GL11.glPopMatrix();
    }
 
-   public void queue(byte var1, byte var2, byte var3, float var4, float var5) {
+   public void queue(byte xp, byte yp, byte zp, float var4, float var5) {
       float var6 = var4 - this.yRot;
 
       float var7;
@@ -149,14 +149,14 @@ public class NetworkPlayer extends HumanoidMob {
 
       var6 = this.yRot + var6 * 0.5F;
       var7 = this.xRot + var7 * 0.5F;
-      this.moveQueue.add(new PositionUpdate(((float)this.xp + (float)var1 / 2.0F) / 32.0F, ((float)this.yp + (float)var2 / 2.0F) / 32.0F, ((float)this.zp + (float)var3 / 2.0F) / 32.0F, var6, var7));
-      this.xp += var1;
-      this.yp += var2;
-      this.zp += var3;
+      this.moveQueue.add(new PositionUpdate(((float)this.xp + (float)xp / 2.0F) / 32.0F, ((float)this.yp + (float)yp / 2.0F) / 32.0F, ((float)this.zp + (float)zp / 2.0F) / 32.0F, var6, var7));
+      this.xp += xp;
+      this.yp += yp;
+      this.zp += zp;
       this.moveQueue.add(new PositionUpdate((float)this.xp / 32.0F, (float)this.yp / 32.0F, (float)this.zp / 32.0F, var4, var5));
    }
 
-   public void teleport(short var1, short var2, short var3, float var4, float var5) {
+   public void teleport(short xp, short yp, short zp, float var4, float var5) {
       float var6 = var4 - this.yRot;
 
       float var7;
@@ -178,57 +178,54 @@ public class NetworkPlayer extends HumanoidMob {
 
       var6 = this.yRot + var6 * 0.5F;
       var7 = this.xRot + var7 * 0.5F;
-      this.moveQueue.add(new PositionUpdate((float)(this.xp + var1) / 64.0F, (float)(this.yp + var2) / 64.0F, (float)(this.zp + var3) / 64.0F, var6, var7));
-      this.xp = var1;
-      this.yp = var2;
-      this.zp = var3;
+      this.moveQueue.add(new PositionUpdate((float)(this.xp + xp) / 64.0F, (float)(this.yp + yp) / 64.0F, (float)(this.zp + zp) / 64.0F, var6, var7));
+      this.xp = xp;
+      this.yp = yp;
+      this.zp = zp;
       this.moveQueue.add(new PositionUpdate((float)this.xp / 32.0F, (float)this.yp / 32.0F, (float)this.zp / 32.0F, var4, var5));
    }
 
-   public void queue(byte var1, byte var2, byte var3) {
-      this.moveQueue.add(new PositionUpdate(((float)this.xp + (float)var1 / 2.0F) / 32.0F, ((float)this.yp + (float)var2 / 2.0F) / 32.0F, ((float)this.zp + (float)var3 / 2.0F) / 32.0F));
-      this.xp += var1;
-      this.yp += var2;
-      this.zp += var3;
+   public void queue(byte xp, byte yp, byte zp) {
+      this.moveQueue.add(new PositionUpdate(((float)this.xp + (float)xp / 2.0F) / 32.0F, ((float)this.yp + (float)yp / 2.0F) / 32.0F, ((float)this.zp + (float)zp / 2.0F) / 32.0F));
+      this.xp += xp;
+      this.yp += yp;
+      this.zp += zp;
       this.moveQueue.add(new PositionUpdate((float)this.xp / 32.0F, (float)this.yp / 32.0F, (float)this.zp / 32.0F));
    }
 
-   public void queue(float var1, float var2) {
-      float var3 = var1 - this.yRot;
+   public void queue(float yawOrig, float pitchOrig) {
+      float yawNew = yawOrig - this.yRot;
 
-      float var4;
-      for(var4 = var2 - this.xRot; var3 >= 180.0F; var3 -= 360.0F) {
+      float pitchNew;
+      for(pitchNew = pitchOrig - this.xRot; yawNew >= 180.0F; yawNew -= 360.0F) {
          ;
       }
 
-      while(var3 < -180.0F) {
-         var3 += 360.0F;
+      while(yawNew < -180.0F) {
+         yawNew += 360.0F;
       }
 
-      while(var4 >= 180.0F) {
-         var4 -= 360.0F;
+      while(pitchNew >= 180.0F) {
+         pitchNew -= 360.0F;
       }
 
-      while(var4 < -180.0F) {
-         var4 += 360.0F;
+      while(pitchNew < -180.0F) {
+         pitchNew += 360.0F;
       }
 
-      var3 = this.yRot + var3 * 0.5F;
-      var4 = this.xRot + var4 * 0.5F;
-      this.moveQueue.add(new PositionUpdate(var3, var4));
-      this.moveQueue.add(new PositionUpdate(var1, var2));
+      yawNew = this.yRot + yawNew * 0.5F;
+      pitchNew = this.xRot + pitchNew * 0.5F;
+      this.moveQueue.add(new PositionUpdate(yawNew, pitchNew));
+      this.moveQueue.add(new PositionUpdate(yawOrig, pitchOrig));
    }
 
    public void clear() {
       if(this.a >= 0 && this.textures != null) {
-         TextureManager var10000 = this.textures;
-         int var1 = this.a;
-         TextureManager var2 = this.textures;
-         var10000.textureImages.remove(Integer.valueOf(var1));
-         var2.idBuffer.clear();
-         var2.idBuffer.put(var1);
-         var2.idBuffer.flip();
-         GL11.glDeleteTextures(var2.idBuffer);
+         this.textures.textureImages.remove(Integer.valueOf(this.a));
+         this.textures.idBuffer.clear();
+         this.textures.idBuffer.put(this.a);
+         this.textures.idBuffer.flip();
+         GL11.glDeleteTextures(this.textures.idBuffer);
       }
 
    }

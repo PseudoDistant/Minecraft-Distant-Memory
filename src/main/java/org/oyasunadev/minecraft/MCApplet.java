@@ -20,6 +20,18 @@ public class MCApplet extends MinecraftApplet
 		MP = false;
 
 		parameters = new HashMap();
+
+		String server = System.getProperty("mc.server", "openminecraft.net");
+		String port   = System.getProperty("mc.port", "443");
+		String mppass = System.getProperty("mc.pass", "");
+
+
+		parameters.put("username", System.getProperty("user.name"));
+		parameters.put("sessionid", "" + Math.random());
+		parameters.put("haspaid", Boolean.FALSE.toString());
+		parameters.put("server", server);
+		parameters.put("port", port);
+		parameters.put("mppass", mppass);
 	}
 
 	public MCApplet(String username, String sessionid, boolean haspaid, String server, int port, String mppass)

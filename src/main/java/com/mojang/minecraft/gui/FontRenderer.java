@@ -142,17 +142,17 @@ public final class FontRenderer {
    }
 
    public static String stripColor(String var0) {
-      char[] var3 = var0.toCharArray();
-      String var1 = "";
+      char[] str = var0.toCharArray();
+      String result = "";
 
-      for(int var2 = 0; var2 < var3.length; ++var2) {
-         if(var3[var2] == 38) {
-            ++var2;
+      for(int i = 0; i < str.length; ++i) {
+         if(str[i] == 38) {
+            ++i;
          } else {
-            var1 = var1 + var3[var2];
+            result = result + str[i];
          }
       }
 
-      return var1;
+      return result;
    }
 }

@@ -23,20 +23,20 @@ public class Particle extends Entity {
    protected float bCol;
 
 
-   public Particle(Level var1, float var2, float var3, float var4, float var5, float var6, float var7) {
-      super(var1);
+   public Particle(Level level, float x, float y, float z, float dx, float dy, float dz) {
+      super(level);
       this.setSize(0.2F, 0.2F);
       this.heightOffset = this.bbHeight / 2.0F;
-      this.setPos(var2, var3, var4);
+      this.setPos(x, y, z);
       this.rCol = this.gCol = this.bCol = 1.0F;
-      this.xd = var5 + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
-      this.yd = var6 + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
-      this.zd = var7 + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
+      this.xd = dx + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
+      this.yd = dy + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
+      this.zd = dz + (float)(Math.random() * 2.0D - 1.0D) * 0.4F;
       float var8 = (float)(Math.random() + Math.random() + 1.0D) * 0.15F;
-      var2 = MathHelper.sqrt(this.xd * this.xd + this.yd * this.yd + this.zd * this.zd);
-      this.xd = this.xd / var2 * var8 * 0.4F;
-      this.yd = this.yd / var2 * var8 * 0.4F + 0.1F;
-      this.zd = this.zd / var2 * var8 * 0.4F;
+      x = MathHelper.sqrt(this.xd * this.xd + this.yd * this.yd + this.zd * this.zd);
+      this.xd = this.xd / x * var8 * 0.4F;
+      this.yd = this.yd / x * var8 * 0.4F + 0.1F;
+      this.zd = this.zd / x * var8 * 0.4F;
       this.uo = (float)Math.random() * 3.0F;
       this.vo = (float)Math.random() * 3.0F;
       this.size = (float)(Math.random() * 0.5D + 0.5D);
@@ -45,16 +45,16 @@ public class Particle extends Entity {
       this.makeStepSound = false;
    }
 
-   public Particle setPower(float var1) {
-      this.xd *= var1;
-      this.yd = (this.yd - 0.1F) * var1 + 0.1F;
-      this.zd *= var1;
+   public Particle setPower(float power) {
+      this.xd *= power;
+      this.yd = (this.yd - 0.1F) * power + 0.1F;
+      this.zd *= power;
       return this;
    }
 
-   public Particle scale(float var1) {
-      this.setSize(0.2F * var1, 0.2F * var1);
-      this.size *= var1;
+   public Particle scale(float sizeFactor) {
+      this.setSize(0.2F * sizeFactor, 0.2F * sizeFactor);
+      this.size *= sizeFactor;
       return this;
    }
 

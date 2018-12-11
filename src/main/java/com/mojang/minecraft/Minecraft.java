@@ -1727,9 +1727,9 @@ public final class Minecraft implements Runnable {
       this.setLevel(level);
    }
 
-   public final boolean loadOnlineLevel(String var1, int var2) {
+   public final boolean loadOnlineLevel(String user, int id) {
       Level level;
-      if((level = this.levelIo.loadOnline(this.host, var1, var2)) == null) {
+      if((level = this.levelIo.loadOnline(this.host, user, id)) == null) {
          return false;
       } else {
          this.setLevel(level);
@@ -1737,35 +1737,40 @@ public final class Minecraft implements Runnable {
       }
    }
 
-   public final void setLevel(Level var1) {
-      if(this.applet == null || !this.applet.getDocumentBase().getHost().equalsIgnoreCase("minecraft.net") && !this.applet.getDocumentBase().getHost().equalsIgnoreCase("www.minecraft.net") || !this.applet.getCodeBase().getHost().equalsIgnoreCase("minecraft.net") && !this.applet.getCodeBase().getHost().equalsIgnoreCase("www.minecraft.net")) {
-         var1 = null;
+   public final void setLevel(Level level) {
+      if(this.applet == null
+              ||    !this.applet.getDocumentBase().getHost().equalsIgnoreCase("minecraft.net")
+                 && !this.applet.getDocumentBase().getHost().equalsIgnoreCase("www.minecraft.net")
+              ||    !this.applet.getCodeBase().getHost().equalsIgnoreCase("minecraft.net")
+                 && !this.applet.getCodeBase().getHost().equalsIgnoreCase("www.minecraft.net"))
+      {
+         level = null;
       }
 
-      this.level = var1;
-      if(var1 != null) {
-         var1.initTransient();
-         this.gamemode.apply(var1);
-         var1.font = this.fontRenderer;
-         var1.rendererContext$5cd64a7f = this;
+      this.level = level;
+      if(level != null) {
+         level.initTransient();
+         this.gamemode.apply(level);
+         level.font = this.fontRenderer;
+         level.rendererContext$5cd64a7f = this;
          if(!this.isOnline()) {
-            this.player = (Player)var1.findSubclassOf(Player.class);
+            this.player = (Player)level.findSubclassOf(Player.class);
          } else if(this.player != null) {
             this.player.resetPos();
             this.gamemode.preparePlayer(this.player);
-            if(var1 != null) {
-               var1.player = this.player;
-               var1.addEntity(this.player);
+            if(level != null) {
+               level.player = this.player;
+               level.addEntity(this.player);
             }
          }
       }
 
       if(this.player == null) {
-         this.player = new Player(var1);
+         this.player = new Player(level);
          this.player.resetPos();
          this.gamemode.preparePlayer(this.player);
-         if(var1 != null) {
-            var1.player = this.player;
+         if(level != null) {
+            level.player = this.player;
          }
       }
 
@@ -1780,17 +1785,17 @@ public final class Minecraft implements Runnable {
             var3.level.removeListener(var3);
          }
 
-         var3.level = var1;
-         if(var1 != null) {
-            var1.addListener(var3);
+         var3.level = level;
+         if(level != null) {
+            level.addListener(var3);
             var3.refresh();
          }
       }
 
       if(this.particleManager != null) {
          ParticleManager var5 = this.particleManager;
-         if(var1 != null) {
-            var1.particleEngine = var5;
+         if(level != null) {
+            level.particleEngine = var5;
          }
 
          for(int var4 = 0; var4 < 2; ++var4) {

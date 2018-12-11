@@ -30,7 +30,7 @@ public class ServerConnectThread extends Thread
 			netManager.netHandler.send(PacketType.IDENTIFICATION, new Object[]{Byte.valueOf((byte)7), this.username, this.key, Integer.valueOf(0)});
 
 			netManager.successful = true;
-		} catch (Exception var3) {
+		} catch (Exception exception) {
 			minecraft.online = false;
 
 			minecraft.networkManager = null;
