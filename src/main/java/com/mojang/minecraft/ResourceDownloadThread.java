@@ -35,27 +35,29 @@ public class ResourceDownloadThread extends Thread
 			URL url = null;
 			URLConnection con = null;
 
-			try {
-				base = new URL("http://dl.dropbox.com/u/40737374/minecraft_resources/");
-				url = new URL(base, "resources/");
-
-				con = url.openConnection();
-
-				con.setConnectTimeout(20000);
-
-				if (con instanceof HttpURLConnection) {
-					int code = ((HttpURLConnection) con).getResponseCode();
-					String status = ((HttpURLConnection) con).getResponseMessage();
-					if (code != 200) {
-						((HttpURLConnection) con).disconnect();
-						con = null;
-						System.err.println("WARN:  A request to URL \"" + url.toString() + "\" returned " + code + " http response code with status \"" + status + "\".");
-					}
-				}
-			} catch (UnknownHostException unknownHost) {
-				unknownHost.printStackTrace();
-				con = null;
-			}
+//
+//
+//			try {
+//				  base = new URL("http://dl.dropbox.com/u/40737374/minecraft_resources/");
+//            url = new URL(base, "resources/");
+//
+//				con = url.openConnection();
+//
+//				con.setConnectTimeout(20000);
+//
+//				if (con instanceof HttpURLConnection) {
+//					int code = ((HttpURLConnection) con).getResponseCode();
+//					String status = ((HttpURLConnection) con).getResponseMessage();
+//					if (code != 200) {
+//						((HttpURLConnection) con).disconnect();
+//						con = null;
+//						System.err.println("WARN:  A request to URL \"" + url.toString() + "\" returned " + code + " http response code with status \"" + status + "\".");
+//					}
+//				}
+//			} catch (UnknownHostException unknownHost) {
+//				unknownHost.printStackTrace();
+//				con = null;
+//			}
 
 			if (con != null) {
 				reader = new BufferedReader(new InputStreamReader(con.getInputStream()));

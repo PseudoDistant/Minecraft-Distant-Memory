@@ -3,7 +3,13 @@ package com.mojang.minecraft;
 import com.mojang.minecraft.gamemode.CreativeGameMode;
 import com.mojang.minecraft.gamemode.GameMode;
 import com.mojang.minecraft.gamemode.SurvivalGameMode;
-import com.mojang.minecraft.gui.*;
+import com.mojang.minecraft.gui.ChatInputScreen;
+import com.mojang.minecraft.gui.ErrorScreen;
+import com.mojang.minecraft.gui.FontRenderer;
+import com.mojang.minecraft.gui.GameOverScreen;
+import com.mojang.minecraft.gui.GuiScreen;
+import com.mojang.minecraft.gui.HUDScreen;
+import com.mojang.minecraft.gui.PauseScreen;
 import com.mojang.minecraft.item.Arrow;
 import com.mojang.minecraft.item.Item;
 import com.mojang.minecraft.level.Level;
@@ -25,8 +31,15 @@ import com.mojang.minecraft.particle.WaterDropParticle;
 import com.mojang.minecraft.phys.AABB;
 import com.mojang.minecraft.player.InputHandlerImpl;
 import com.mojang.minecraft.player.Player;
-import com.mojang.minecraft.render.*;
+import com.mojang.minecraft.render.Chunk;
+import com.mojang.minecraft.render.ChunkDirtyDistanceComparator;
+import com.mojang.minecraft.render.Frustrum;
+import com.mojang.minecraft.render.FrustrumImpl;
+import com.mojang.minecraft.render.HeldBlock;
+import com.mojang.minecraft.render.LevelRenderer;
 import com.mojang.minecraft.render.Renderer;
+import com.mojang.minecraft.render.ShapeRenderer;
+import com.mojang.minecraft.render.TextureManager;
 import com.mojang.minecraft.render.texture.TextureFX;
 import com.mojang.minecraft.render.texture.TextureLavaFX;
 import com.mojang.minecraft.render.texture.TextureWaterFX;
@@ -47,9 +60,22 @@ import org.lwjgl.util.glu.GLU;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+import java.awt.AWTException;
+import java.awt.Canvas;
+import java.awt.Component;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.IntBuffer;
 import java.util.Collections;
 import java.util.List;
@@ -290,7 +316,12 @@ public final class Minecraft implements Runnable {
             }
             break;
          case 4:
-            workDir = new File(userDir, "Library/Application Support/" + minecraftDirName);
+            String appDataDirMac;
+            if((appDataDirMac = System.getenv("APPDATA")) != null) {
+               workDir = new File(appDataDirMac, "." + minecraftDirName + '/');
+            } else {
+               workDir = new File(userDir, "Library/Application Support/" + minecraftDirName);
+            }
             break;
          default:
             workDir = new File(userDir, minecraftDirName + '/');
