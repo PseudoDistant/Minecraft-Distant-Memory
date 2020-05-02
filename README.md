@@ -75,6 +75,11 @@ Then in the console, execute the command:
 ./gradlew run
 ```
 
+Missing Sound Resources
+-----------------------
+
+https://github.com/aschuma/Minecraft-Classic-Forever/commit/26049dd1a3cafd4aa841da01d7d08120a05cba1b
+
 Screenshots
 -----------
 
