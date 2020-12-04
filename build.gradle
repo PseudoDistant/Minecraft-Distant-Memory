@@ -33,9 +33,9 @@ run {
 
  // Change the below line according to your operating system as follows: 
  // Linux:
- // systemProperty "java.library.path", 'run/native/linux'
+ systemProperty "java.library.path", 'run/native/linux'
  // Mac OS X:
- systemProperty "java.library.path", 'run/native/macosx'
+ // systemProperty "java.library.path", 'run/native/macosx'
  // Solaris:
  // systemProperty "java.library.path", 'run/native/solaris'
  // Windows:
